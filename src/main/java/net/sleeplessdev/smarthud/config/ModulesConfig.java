@@ -13,7 +13,6 @@ import net.sleeplessdev.smarthud.data.PickupStyle;
 @Config(modid = SmartHUD.ID, name = SmartHUD.ID + "/modules", category = "")
 @Mod.EventBusSubscriber(modid = SmartHUD.ID, value = Side.CLIENT)
 public final class ModulesConfig {
-
     @Config.Name("hotbar")
     public static final Hotbar HOTBAR_HUD = new Hotbar();
 
@@ -24,43 +23,29 @@ public final class ModulesConfig {
 
     @SubscribeEvent
     protected static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
-        if (SmartHUD.ID.equals(event.getModID())) {
-            ConfigManager.sync(SmartHUD.ID, Config.Type.INSTANCE);
-        }
+        if (SmartHUD.ID.equals(event.getModID())) ConfigManager.sync(SmartHUD.ID, Config.Type.INSTANCE);
     }
 
     public static final class Hotbar {
         public boolean alwaysShow = false;
-
         public HotbarStyle hudStyle = HotbarStyle.OFFHAND;
-
         public boolean isEnabled = true;
-
         public boolean mergeDuplicates = true;
-
         public boolean renderOverlays = true;
-
         public boolean showStackSize = false;
-
         @Config.RangeInt(min = 1, max = 9)
         public int slotLimit = 3;
     }
 
     public static final class ItemPickup {
         //public PickupAnimation animationStyle = PickupAnimation.GLIDE;
-
         public int displayTime = 3000;
-
         public PickupStyle hudStyle = PickupStyle.BOTH;
-
         public boolean isEnabled = true;
-
         public int itemLimit = 10;
-
         @Config.Comment({ "0: The most recently picked up item will be moved to the first slot",
                           "1: The order will remain the same, only item counts will be changed" })
         @Config.RangeInt(min = 0, max = 1)
         public int priorityMode = 0;
     }
-
 }

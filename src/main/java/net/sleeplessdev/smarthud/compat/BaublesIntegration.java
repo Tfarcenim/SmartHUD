@@ -19,29 +19,30 @@ import java.util.List;
 
 @Mod.EventBusSubscriber(modid = SmartHUD.ID, value = Side.CLIENT)
 public final class BaublesIntegration {
-
     private static List<CachedItem> baubles = new ArrayList<>();
 
     private BaublesIntegration() {}
 
     public static ImmutableList<CachedItem> getBaubles() {
-        return ImmutableList.copyOf(baubles);
+        return ImmutableList.copyOf(BaublesIntegration.baubles);
     }
 
     @SubscribeEvent
     @Optional.Method(modid = "baubles")
     protected static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        IBaublesItemHandler handler = BaublesApi.getBaublesHandler(event.player);
-        int dim = event.player.dimension;
-        boolean merge = ModulesConfig.HOTBAR_HUD.mergeDuplicates;
-        List<CachedItem> baubleCache = new ArrayList<>();
+        final IBaublesItemHandler handler = BaublesApi.getBaublesHandler(event.player);
+        final int dim = event.player.dimension;
+        final boolean merge = ModulesConfig.HOTBAR_HUD.mergeDuplicates;
+        final List<CachedItem> baubleCache = new ArrayList<>();
+
         for (int slot = 0; slot < handler.getSlots(); ++slot) {
-            ItemStack bauble = handler.getStackInSlot(slot).copy();
+            final ItemStack bauble = handler.getStackInSlot(slot).copy();
+
             if (!bauble.isEmpty() && StackHelper.isWhitelisted(bauble, dim)) {
                 StackHelper.processStack(baubleCache, bauble, merge);
             }
         }
-        baubles = baubleCache;
-    }
 
+        BaublesIntegration.baubles = baubleCache;
+    }
 }

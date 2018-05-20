@@ -1,7 +1,6 @@
 package net.sleeplessdev.smarthud.util;
 
 public final class StringHelper {
-
     private StringHelper() {}
 
     /**
@@ -10,19 +9,22 @@ public final class StringHelper {
      * @return The abbreviated number
      */
     public static String getAbbreviatedValue(int value) {
-        StringBuilder abbr = new StringBuilder();
-        int magnitude = (int) Math.floor(Math.log(value) / Math.log(1000.0D));
-        int num = (int) (value / Math.pow(1000.0D, magnitude) * 10.0D);
-        int integer = num / 10;
-        int fractional = num % 10;
+        final StringBuilder abbr = new StringBuilder();
+        final int magnitude = (int) Math.floor(Math.log(value) / Math.log(1000.0D));
+        final int num = (int) (value / Math.pow(1000.0D, magnitude) * 10.0D);
+        final int integer = num / 10;
+        final int fractional = num % 10;
+
         abbr.append(integer);
+
         if (integer < 10 && fractional > 0) {
             abbr.append('.').append(fractional);
         }
+
         if (magnitude > 0) {
             abbr.append("kmbtpe".charAt(magnitude - 1));
         }
+
         return abbr.toString();
     }
-
 }

@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.sleeplessdev.smarthud.SmartHUD;
+import net.sleeplessdev.smarthud.config.ModulesConfig;
 import net.sleeplessdev.smarthud.event.ItemPickupQueue;
 import net.sleeplessdev.smarthud.util.CachedItem;
 import net.sleeplessdev.smarthud.util.HandHelper;
@@ -16,10 +17,7 @@ import net.sleeplessdev.smarthud.util.interpolation.CubicBezierInterpolator;
 
 import java.util.Iterator;
 
-import static net.sleeplessdev.smarthud.config.ModulesConfig.ITEM_PICKUP_HUD;
-
 public final class ItemPickupRender implements IRenderEvent {
-
     private static final CubicBezierInterpolator ANIMATION = new CubicBezierInterpolator(0.42D, 0.0D, 0.58D, 1.0D);
     private static final float ANIMATION_DURATION = 10.0F;
 
@@ -27,7 +25,7 @@ public final class ItemPickupRender implements IRenderEvent {
 
     @Override
     public boolean canRender() {
-        return ITEM_PICKUP_HUD.isEnabled;
+        return ModulesConfig.ITEM_PICKUP_HUD.isEnabled;
     }
 
     @Override
@@ -38,27 +36,30 @@ public final class ItemPickupRender implements IRenderEvent {
     @Override
     public void onRenderTickPre(RenderContext ctx) {
         EvictingQueue<CachedItem> items = ItemPickupQueue.getItems();
-        if (items.isEmpty()) return;
-        int x = ITEM_PICKUP_HUD.hudStyle.hasItemIcon() ? 17 : 4;
-        int y = ctx.getScreenHeight() - (ctx.getFontHeight() * items.size()) - (2 * items.size());
-        Iterator<CachedItem> iterator = items.iterator();
-        for (int i = 0; iterator.hasNext(); ++i) {
-            CachedItem cachedItem = iterator.next();
-            int y1 = y + (ctx.getFontHeight() * i) + (2 * i);
-            if (renderLabel(ctx, x, y1, cachedItem)) {
-                iterator.remove();
+        if (!items.isEmpty()) {
+            final int x = ModulesConfig.ITEM_PICKUP_HUD.hudStyle.hasItemIcon() ? 17 : 4;
+            final int y = ctx.getScreenHeight() - (ctx.getFontHeight() * items.size()) - (2 * items.size());
+            final Iterator<CachedItem> iterator = items.iterator();
+
+            for (int i = 0; iterator.hasNext(); ++i) {
+                final CachedItem cachedItem = iterator.next();
+                final int y1 = y + (ctx.getFontHeight() * i) + (2 * i);
+
+                if (renderLabel(ctx, x, y1, cachedItem)) {
+                    iterator.remove();
+                }
             }
         }
     }
 
     private boolean renderLabel(RenderContext ctx, float renderX, float renderY, CachedItem item) {
-        boolean name = ITEM_PICKUP_HUD.hudStyle.hasItemName();
-        String key = "label." + SmartHUD.ID + ".pickup." + (name ? "long" : "short");
-        String count = StringHelper.getAbbreviatedValue(item.getCount());
-        String label = I18n.format(key, count, item.getName());
+        final boolean name = ModulesConfig.ITEM_PICKUP_HUD.hudStyle.hasItemName();
+        final String key = "label." + SmartHUD.ID + ".pickup." + (name ? "long" : "short");
+        final String count = StringHelper.getAbbreviatedValue(item.getCount());
+        final String label = I18n.format(key, count, item.getName());
 
-        int color = 0xFFFFFF;
-        int labelWidth = ctx.getStringWidth(label);
+        final int color = 0xFFFFFF;
+        final int labelWidth = ctx.getStringWidth(label);
         float labelX = HandHelper.handleVariableOffset(renderX, labelWidth);
         float iconX = HandHelper.handleVariableOffset(renderX - 14.0F, 10.72F);
 
@@ -67,29 +68,29 @@ public final class ItemPickupRender implements IRenderEvent {
             iconX += ctx.getScreenHeight();
         }
 
-        long remaining = item.getRemainingTicks(ITEM_PICKUP_HUD.displayTime);
+        long remaining = item.getRemainingTicks(ModulesConfig.ITEM_PICKUP_HUD.displayTime);
 
         if (remaining < 0) {
-            float time = Math.abs(remaining) + ctx.getPartialTicks();
-            if (time > ANIMATION_DURATION) return true;
-//            switch (ITEM_PICKUP_HUD.animationStyle) {
-//                case FADE:
-//                    float alpha = (float) (1.0F * Math.sin(time));
-//                    color |= (int) alpha << 24; // FIXME
-//                    break;
-//                case GLIDE:
-                    float end = renderX + labelWidth;
-                    float interpolation = ANIMATION.interpolate(0, ANIMATION_DURATION, time) * end;
-                    labelX += HandHelper.isLeftHanded() ? interpolation : -interpolation;
-                    iconX += HandHelper.isLeftHanded() ? interpolation : -interpolation;
-//                    break;
-//            }
-
+            final float time = Math.abs(remaining) + ctx.getPartialTicks();
+            if (time > ItemPickupRender.ANIMATION_DURATION) return true;
+            //            switch (ITEM_PICKUP_HUD.animationStyle) {
+            //                case FADE:
+            //                    float alpha = (float) (1.0F * Math.sin(time));
+            //                    color |= (int) alpha << 24; // FIXME
+            //                    break;
+            //                case GLIDE:
+            final float end = renderX + labelWidth;
+            final float interpolation = ItemPickupRender.ANIMATION
+                    .interpolate(0, ItemPickupRender.ANIMATION_DURATION, time) * end;
+            labelX += HandHelper.isLeftHanded() ? interpolation : -interpolation;
+            iconX += HandHelper.isLeftHanded() ? interpolation : -interpolation;
+            //                    break;
+            //            }
         }
 
         ctx.drawString(label, labelX, renderY, color);
 
-        if (ITEM_PICKUP_HUD.hudStyle.hasItemIcon()) {
+        if (ModulesConfig.ITEM_PICKUP_HUD.hudStyle.hasItemIcon()) {
             GlStateManager.enableAlpha();
             RenderHelper.enableGUIStandardItemLighting();
             GlStateManager.pushMatrix();
@@ -102,5 +103,4 @@ public final class ItemPickupRender implements IRenderEvent {
 
         return false;
     }
-
 }

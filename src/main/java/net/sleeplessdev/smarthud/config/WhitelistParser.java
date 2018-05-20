@@ -35,13 +35,12 @@ import java.util.stream.Stream;
 
 @Mod.EventBusSubscriber(modid = SmartHUD.ID, value = Side.CLIENT)
 public final class WhitelistParser {
-
     private static final List<CachedItem> WHITELIST = new ArrayList<>();
 
     private WhitelistParser() {}
 
     public static ImmutableList<CachedItem> getWhitelist() {
-        return ImmutableList.copyOf(WHITELIST);
+        return ImmutableList.copyOf(WhitelistParser.WHITELIST);
     }
 
     @SubscribeEvent
@@ -53,17 +52,17 @@ public final class WhitelistParser {
 
     public static void reloadWhitelistEntries() {
         if (!GeneralConfig.WHITELIST.isEnabled) {
-            WHITELIST.clear();
-            WHITELIST.add(new CachedItem(new ItemStack(Items.CLOCK)));
-            WHITELIST.add(new CachedItem(new ItemStack(Items.COMPASS)));
+            WhitelistParser.WHITELIST.clear();
+            WhitelistParser.WHITELIST.add(new CachedItem(new ItemStack(Items.CLOCK)));
+            WhitelistParser.WHITELIST.add(new CachedItem(new ItemStack(Items.COMPASS)));
             return;
         }
 
-        Stopwatch stopwatch = Stopwatch.createStarted();
-        List<String> missingEntries = new ArrayList<>();
-        JsonElement file;
+        final Stopwatch stopwatch = Stopwatch.createStarted();
+        final  List<String> missingEntries = new ArrayList<>();
+        final JsonElement file;
 
-        try (InputStreamReader reader = new InputStreamReader(new FileInputStream(getOrGenerateJson()))) {
+        try (final InputStreamReader reader = new InputStreamReader(new FileInputStream(getOrGenerateJson()))) {
             file = new JsonParser().parse(reader);
         } catch (IOException e) {
             SmartHUD.LOGGER.warn("Failed to parse whitelist config! Please report this to the mod author.");
@@ -71,112 +70,105 @@ public final class WhitelistParser {
             return;
         }
 
-        WHITELIST.clear();
+        WhitelistParser.WHITELIST.clear();
 
-        JsonArray entries;
+        final JsonArray entries;
 
         try {
             entries = file.getAsJsonArray();
         } catch (IllegalStateException e) {
             SmartHUD.LOGGER.warn("Received invalid data from the whitelist, please check your formatting!");
-            entries = new JsonArray();
+            return;
         }
 
         for (int i = 0; i < entries.size(); ++i) {
-            JsonObject json = entries.get(i).getAsJsonObject();
+            final JsonObject json = entries.get(i).getAsJsonObject();
 
             if (json.isJsonNull() || !json.has("item")) {
-                String msg = "Whitelist entry at index {} is missing required value \"item\"";
-                SmartHUD.LOGGER.warn(msg, i);
+                SmartHUD.LOGGER.warn("Whitelist entry at index {} is missing required value \"item\"", i);
                 continue;
             }
 
-            ResourceLocation id = new ResourceLocation(json.get("item").getAsString());
-            Item item = Item.REGISTRY.getObject(id);
+            final ResourceLocation id = new ResourceLocation(json.get("item").getAsString());
+            final Item item = Item.REGISTRY.getObject(id);
 
             if (item == null) {
                 if (Loader.isModLoaded(id.getResourceDomain())) {
-                    String msg = "Unable to find item for whitelist entry at index {} by name <{}>";
-                    SmartHUD.LOGGER.warn(msg, i, id);
+                    SmartHUD.LOGGER.warn("Unable to find item for whitelist entry at index {} by name <{}>", i, id);
                 } else if (!missingEntries.contains(id.getResourceDomain())) {
                     missingEntries.add(id.toString());
                 }
                 continue;
             }
 
-            CachedItem cachedItem = new CachedItem(new ItemStack(item));
+            final CachedItem cachedItem = new CachedItem(new ItemStack(item));
 
             if (json.has("meta")) {
-                int meta = json.get("meta").getAsInt();
+                final int meta = json.get("meta").getAsInt();
+
                 if (meta < 0 || meta > Short.MAX_VALUE) {
-                    String msg = "Invalid metadata <{}> found in whitelist entry at index {}";
-                    SmartHUD.LOGGER.warn(msg, meta, i);
+                    SmartHUD.LOGGER.warn("Invalid metadata <{}> found in whitelist entry at index {}", meta, i);
                 } else cachedItem.setMetadata(meta);
             }
 
-            if (json.has("ignore_nbt")) {
-                boolean ignoreNBT = json.get("ignore_nbt").getAsBoolean();
-                cachedItem.setIgnoreNBT(ignoreNBT);
-            }
+            if (json.has("ignore_nbt")) cachedItem.setIgnoreNBT(json.get("ignore_nbt").getAsBoolean());
 
-            if (json.has("ignore_dmg")) {
-                boolean ignoreDmg = json.get("ignore_dmg").getAsBoolean();
-                cachedItem.setIgnoreDmg(ignoreDmg);
-            }
+            if (json.has("ignore_dmg")) cachedItem.setIgnoreDmg(json.get("ignore_dmg").getAsBoolean());
 
             if (json.has("dimensions")) {
-                JsonArray array = json.get("dimensions").getAsJsonArray();
+                final JsonArray array = json.get("dimensions").getAsJsonArray();
+
                 if (array.size() == 1) {
-                    int dim = array.get(0).getAsInt();
+                    final int dim = array.get(0).getAsInt();
+
                     if (testDimension(dim, i)) {
                         cachedItem.setDimensionPredicate(d -> d == dim);
                     } else cachedItem.setDimensionPredicate(d -> false);
                 } else {
                     final int index = i;
-                    IntOpenHashSet dimensions = Stream.of(array)
+                    final IntOpenHashSet dimensions = Stream.of(array)
                             .map(JsonArray::getAsInt)
                             .filter(dim -> WhitelistParser.testDimension(dim, index))
                             .collect(Collectors.toCollection(IntOpenHashSet::new));
+
                     cachedItem.setDimensionPredicate(dimensions::contains);
                 }
             }
 
-            if (!WHITELIST.contains(cachedItem)) {
-                WHITELIST.add(cachedItem);
-            }
+            if (!WhitelistParser.WHITELIST.contains(cachedItem)) WhitelistParser.WHITELIST.add(cachedItem);
         }
 
-        String msg = "Finished processing whitelist config in {}ms";
-        long time = stopwatch.stop().elapsed(TimeUnit.MILLISECONDS);
-        SmartHUD.LOGGER.info(msg, time);
+        final long time = stopwatch.stop().elapsed(TimeUnit.MILLISECONDS);
+        SmartHUD.LOGGER.info("Finished processing whitelist config in {}ms", time);
 
         if (!missingEntries.isEmpty() && GeneralConfig.WHITELIST.logMissingEntries) {
             SmartHUD.LOGGER.warn("Entries were skipped as the following items could not be found:");
-            for (String entry : missingEntries) {
-                SmartHUD.LOGGER.warn("-> " + entry);
-            }
+            for (String entry : missingEntries) SmartHUD.LOGGER.warn("-> " + entry);
         }
     }
 
     private static boolean testDimension(int dim, int index) {
-        if (DimensionManager.isDimensionRegistered(dim)) return true;
-        SmartHUD.LOGGER.warn("Unregistered or invalid dimension {} found in whitelist entry at index {}", dim, index);
-        return false;
+        if (!DimensionManager.isDimensionRegistered(dim)) {
+            SmartHUD.LOGGER.warn("Unregistered or invalid dimension {} found in whitelist entry at index {}", dim, index);
+            return false;
+        }
+        return true;
     }
 
     private static File getOrGenerateJson() {
-        String path = "/assets/" + SmartHUD.ID + "/data/whitelist.json";
-        File defaultWhitelist = new File(SmartHUD.getConfigPath(), "defaults.json");
-        File userWhitelist = new File(SmartHUD.getConfigPath(), "whitelist.json");
+        final String path = "/assets/" + SmartHUD.ID + "/data/whitelist.json";
+        final File defaultWhitelist = new File(SmartHUD.getConfigPath(), "defaults.json");
+        final File userWhitelist = new File(SmartHUD.getConfigPath(), "whitelist.json");
+
         writeToFile(path, defaultWhitelist, true);
-        if (!userWhitelist.exists()) {
-            writeToFile(path, userWhitelist, false);
-        }
+
+        if (!userWhitelist.exists()) writeToFile(path, userWhitelist, false);
+
         return userWhitelist;
     }
 
     private static void writeToFile(String path, File file, boolean overwrite) {
-        try (InputStream stream = SmartHUD.class.getResourceAsStream(path)) {
+        try (final InputStream stream = SmartHUD.class.getResourceAsStream(path)) {
             if (overwrite) {
                 Files.copy(stream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } else Files.copy(stream, file.toPath());
@@ -184,5 +176,4 @@ public final class WhitelistParser {
             e.printStackTrace();
         }
     }
-
 }

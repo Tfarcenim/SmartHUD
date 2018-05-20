@@ -7,7 +7,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public final class HandHelper {
-
     private HandHelper() {}
 
     public static EnumHandSide getMainHand() {
@@ -28,11 +27,12 @@ public final class HandHelper {
      */
     public static float handleVariableOffset(float currentOffset, float objectWidth) {
         float newOffset = 0.0F;
+
         if (isLeftHanded()) {
             currentOffset = -currentOffset;
             newOffset = -objectWidth;
         }
+
         return currentOffset + newOffset;
     }
-
 }

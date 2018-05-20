@@ -1,12 +1,12 @@
 package net.sleeplessdev.smarthud.data;
 
 public enum PickupStyle {
-
     BOTH(true, true),
     ICON_ONLY(true, false),
     NAME_ONLY(false, true);
 
-    private final boolean hasIcon, hasLabel;
+    private final boolean hasIcon;
+    private final boolean hasLabel;
 
     PickupStyle(boolean hasIcon, boolean hasLabel) {
         this.hasIcon = hasIcon;
@@ -20,5 +20,4 @@ public enum PickupStyle {
     public boolean hasItemName() {
         return hasLabel;
     }
-
 }

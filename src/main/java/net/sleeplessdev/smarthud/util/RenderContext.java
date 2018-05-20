@@ -12,7 +12,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public final class RenderContext {
-
     private final Minecraft minecraft;
 
     private final int screenWidth;
@@ -84,5 +83,4 @@ public final class RenderContext {
     public void renderItemOverlays(ItemStack stack, int x, int y) {
         minecraft.getRenderItem().renderItemOverlays(minecraft.fontRenderer, stack, x, y);
     }
-
 }

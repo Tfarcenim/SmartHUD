@@ -17,30 +17,32 @@ import java.util.List;
 
 @Mod.EventBusSubscriber(modid = SmartHUD.ID, value = Side.CLIENT)
 public final class InventoryCache {
-
     private static List<CachedItem> inventory = new ArrayList<>();
 
     private InventoryCache() {}
 
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        boolean merge = ModulesConfig.HOTBAR_HUD.mergeDuplicates;
-        int dim = event.player.dimension;
-        List<ItemStack> inv = event.player.inventory.mainInventory;
-        List<CachedItem> inventoryCache = new ArrayList<>();
+        final boolean merge = ModulesConfig.HOTBAR_HUD.mergeDuplicates;
+        final int dim = event.player.dimension;
+        final List<ItemStack> inv = event.player.inventory.mainInventory;
+        final List<CachedItem> inventoryCache = new ArrayList<>();
+
         for (int slot = 9; slot < 36; ++slot) {
-            ItemStack stack = inv.get(slot).copy();
+            final ItemStack stack = inv.get(slot).copy();
+
             if (!stack.isEmpty() && StackHelper.isWhitelisted(stack, dim)) {
                 StackHelper.processStack(inventoryCache, stack, merge);
             }
         }
-        List<CachedItem> baubles = BaublesIntegration.getBaubles();
+        final List<CachedItem> baubles = BaublesIntegration.getBaubles();
+
         if (!baubles.isEmpty()) inventoryCache.addAll(baubles);
-        inventory = inventoryCache;
+
+       InventoryCache.inventory = inventoryCache;
     }
 
     public static ImmutableList<CachedItem> getInventory() {
-        return ImmutableList.copyOf(inventory);
+        return ImmutableList.copyOf(InventoryCache.inventory);
     }
-
 }

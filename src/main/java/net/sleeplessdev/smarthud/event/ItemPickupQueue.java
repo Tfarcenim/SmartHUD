@@ -29,7 +29,6 @@ import static net.sleeplessdev.smarthud.config.ModulesConfig.ITEM_PICKUP_HUD;
 
 @Mod.EventBusSubscriber(modid = SmartHUD.ID, value = Side.CLIENT)
 public final class ItemPickupQueue {
-
     private static EvictingQueue<CachedItem> items = EvictingQueue.create(ITEM_PICKUP_HUD.itemLimit);
 
     private static boolean init = false;
@@ -45,30 +44,30 @@ public final class ItemPickupQueue {
     }
 
     private static void reloadQueue() {
-        EvictingQueue<CachedItem> newQueue = EvictingQueue.create(ITEM_PICKUP_HUD.itemLimit);
-        newQueue.addAll(items);
-        items = newQueue;
+        final EvictingQueue<CachedItem> newQueue = EvictingQueue.create(ITEM_PICKUP_HUD.itemLimit);
+
+        newQueue.addAll(ItemPickupQueue.items);
+        ItemPickupQueue.items = newQueue;
     }
 
     @SubscribeEvent
     protected static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
-        if (SmartHUD.ID.equals(event.getModID())) {
-            reloadQueue();
-        }
+        if (SmartHUD.ID.equals(event.getModID())) reloadQueue();
     }
 
     public static EvictingQueue<CachedItem> getItems() {
-        return items;
+        return ItemPickupQueue.items;
     }
 
     private static void initializeParticleQueue() {
         try {
-            Field field = ReflectionHelper.findField(ParticleManager.class, "field_187241_h", "queue");
-            MethodHandles.Lookup lookup = MethodHandles.lookup();
-            MethodHandle itemGetter = getParticleItemPickupGetter(lookup, "field_174840_a", "item");
-            MethodHandle targetGetter = getParticleItemPickupGetter(lookup, "field_174843_ax", "target");
-            ParticleManager particleManager = Minecraft.getMinecraft().effectRenderer;
-            Queue<Particle> newQueue = (Queue<Particle>) field.get(particleManager);
+            final Field field = ReflectionHelper.findField(ParticleManager.class, "field_187241_h", "queue");
+            final MethodHandles.Lookup lookup = MethodHandles.lookup();
+            final MethodHandle itemGetter = getParticleItemPickupGetter(lookup, "field_174840_a", "item");
+            final MethodHandle targetGetter = getParticleItemPickupGetter(lookup, "field_174843_ax", "target");
+            final ParticleManager particleManager = Minecraft.getMinecraft().effectRenderer;
+            final Queue<Particle> newQueue = (Queue<Particle>) field.get(particleManager);
+
             field.set(particleManager, createForwardingParticleQueue(newQueue, itemGetter, targetGetter));
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -90,7 +89,9 @@ public final class ItemPickupQueue {
             public boolean add(@Nullable Particle element) {
                 if (!super.add(element)) return false;
                 if (element != null && ParticleItemPickup.class.equals(element.getClass())) {
-                    Entity item, target;
+                    final Entity item;
+                    final Entity target;
+
                     try {
                         item = (Entity) itemGetter.invoke(element);
                         target = (Entity) targetGetter.invoke(element);
@@ -98,10 +99,12 @@ public final class ItemPickupQueue {
                         Throwables.throwIfUnchecked(e);
                         throw new RuntimeException(e);
                     }
+
                     if (item instanceof EntityItem && target instanceof EntityPlayerSP) {
                         handleItemCollection(((EntityItem) item).getItem());
                     }
                 }
+
                 return true;
             }
         };
@@ -109,13 +112,17 @@ public final class ItemPickupQueue {
 
     private static void handleItemCollection(ItemStack stack) {
         if (!stack.isEmpty()) {
-            EvictingQueue<CachedItem> newItems = EvictingQueue.create(ITEM_PICKUP_HUD.itemLimit);
-            newItems.addAll(items);
-            if (!items.isEmpty()) {
+            final EvictingQueue<CachedItem> newItems = EvictingQueue.create(ITEM_PICKUP_HUD.itemLimit);
+
+            newItems.addAll(ItemPickupQueue.items);
+
+            if (!ItemPickupQueue.items.isEmpty()) {
                 boolean shouldCache = true;
-                for (CachedItem cachedItem : items) {
+
+                for (final CachedItem cachedItem : ItemPickupQueue.items) {
                     if (cachedItem.matchesStack(stack, true)) {
-                        int count = cachedItem.getCount() + stack.getCount();
+                        final int count = cachedItem.getCount() + stack.getCount();
+
                         if (ITEM_PICKUP_HUD.priorityMode == 0) {
                             newItems.remove(cachedItem);
                             newItems.add(new CachedItem(stack, count));
@@ -128,14 +135,11 @@ public final class ItemPickupQueue {
                         break;
                     }
                 }
-                if (shouldCache) {
-                    newItems.add(new CachedItem(stack, stack.getCount()));
-                }
-            } else {
-                newItems.add(new CachedItem(stack, stack.getCount()));
-            }
-            items = newItems;
+
+                if (shouldCache) newItems.add(new CachedItem(stack, stack.getCount()));
+            } else newItems.add(new CachedItem(stack, stack.getCount()));
+
+            ItemPickupQueue.items = newItems;
         }
     }
-
 }

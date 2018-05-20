@@ -1,7 +1,6 @@
 package net.sleeplessdev.smarthud.util.interpolation;
 
 public interface Interpolator {
-
     Interpolator LINEAR = i -> i;
 
     /**
@@ -14,5 +13,4 @@ public interface Interpolator {
     default float interpolate(float min, float max, float x) {
         return interpolate((x - min) / (max - min));
     }
-
 }

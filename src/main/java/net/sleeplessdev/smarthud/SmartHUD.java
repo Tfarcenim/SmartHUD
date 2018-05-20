@@ -10,25 +10,31 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
-@Mod(modid = SmartHUD.ID,
-     name = SmartHUD.NAME,
-     version = SmartHUD.VERSION,
-     dependencies = "after:*",
-     clientSideOnly = true)
+@Mod(
+        modid = SmartHUD.ID,
+        name = SmartHUD.NAME,
+        version = SmartHUD.VERSION,
+        dependencies = SmartHUD.DEPENDENCIES,
+        acceptedMinecraftVersions = SmartHUD.MC_VERSIONS,
+        clientSideOnly = true
+)
 public final class SmartHUD {
-
     public static final String ID = "smarthud";
     public static final String NAME = "Smart HUD";
     public static final String VERSION = "%VERSION%";
+    public static final String DEPENDENCIES = "after:*";
+    public static final String MC_VERSIONS = "[1.11,1.13)";
 
-    public static final Logger LOGGER = LogManager.getLogger(NAME);
+    public static final Logger LOGGER = LogManager.getLogger(SmartHUD.NAME);
 
     private static File configPath;
 
     @Mod.EventHandler
     public void onPreInit(FMLPreInitializationEvent event) {
-        configPath = new File(event.getModConfigurationDirectory(), ID);
-        if (!configPath.exists()) configPath.mkdirs();
+        SmartHUD.configPath = new File(event.getModConfigurationDirectory(), SmartHUD.ID);
+        if (!SmartHUD.configPath.exists() && SmartHUD.configPath.mkdirs()) {
+            SmartHUD.LOGGER.debug("Pre-generated configuration directory");
+        }
     }
 
     @Mod.EventHandler
@@ -38,7 +44,6 @@ public final class SmartHUD {
     }
 
     public static File getConfigPath() {
-        return configPath;
+        return SmartHUD.configPath;
     }
-
 }

@@ -17,7 +17,6 @@ import java.util.List;
 
 @Mod.EventBusSubscriber(modid = SmartHUD.ID, value = Side.CLIENT)
 public final class RenderManager {
-
     private static final List<IRenderEvent> RENDER_EVENTS = Lists.newArrayList(
             new HotbarRender(), new ItemPickupRender()
     );
@@ -26,28 +25,24 @@ public final class RenderManager {
 
     @SubscribeEvent
     protected static void onRenderGameOverlayPre(RenderGameOverlayEvent.Pre event) {
-        Minecraft mc = FMLClientHandler.instance().getClient();
-        RenderContext ctx = new RenderContext(mc, event);
-        for (IRenderEvent render : RENDER_EVENTS) {
-            if (canRender(render, event)) {
-                render.onRenderTickPre(ctx);
-            }
+        final RenderContext ctx = new RenderContext(FMLClientHandler.instance().getClient(), event);
+
+        for (final IRenderEvent render : RenderManager.RENDER_EVENTS) {
+            if (canRender(render, event)) render.onRenderTickPre(ctx);
         }
     }
 
     @SubscribeEvent
     protected static void onRenderGameOverlayPost(RenderGameOverlayEvent.Post event) {
-        Minecraft mc = FMLClientHandler.instance().getClient();
-        RenderContext ctx = new RenderContext(mc, event);
-        for (IRenderEvent render : RENDER_EVENTS) {
-            if (canRender(render, event)) {
-                render.onRenderTickPost(ctx);
-            }
+        final  Minecraft mc = FMLClientHandler.instance().getClient();
+        final RenderContext ctx = new RenderContext(mc, event);
+
+        for (final IRenderEvent render : RenderManager.RENDER_EVENTS) {
+            if (canRender(render, event)) render.onRenderTickPost(ctx);
         }
     }
 
     private static boolean canRender(IRenderEvent render, RenderGameOverlayEvent event) {
         return render.canRender() && render.getType() == event.getType();
     }
-
 }

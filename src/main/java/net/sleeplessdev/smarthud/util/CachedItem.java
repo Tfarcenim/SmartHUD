@@ -6,7 +6,6 @@ import net.minecraftforge.oredict.OreDictionary;
 import java.util.function.IntPredicate;
 
 public final class CachedItem {
-
     private final ItemStack stack;
     private final int actualCount;
     private int meta = OreDictionary.WILDCARD_VALUE;
@@ -82,19 +81,18 @@ public final class CachedItem {
     }
 
     public boolean matchesStack(ItemStack stack, boolean fuzzy) {
-        ItemStack match = stack.copy();
+        final ItemStack match = stack.copy();
+
         match.setCount(1);
-        if (fuzzy) {
-            return this.meta == OreDictionary.WILDCARD_VALUE
-                   ? this.stack.getItem() == match.getItem()
-                   : ItemStack.areItemsEqualIgnoreDurability(this.stack, match);
-        } else {
+
+        if (!fuzzy) {
             boolean isItemEqual = ignoreDmg
                                   ? ItemStack.areItemsEqualIgnoreDurability(this.stack, match)
                                   : ItemStack.areItemsEqual(this.stack, match);
             boolean isNBTEqual = ignoreNBT || ItemStack.areItemStackTagsEqual(this.stack, match);
             return isItemEqual && isNBTEqual;
-        }
+        } else return this.meta == OreDictionary.WILDCARD_VALUE
+                      ? this.stack.getItem() == match.getItem()
+                      : ItemStack.areItemsEqualIgnoreDurability(this.stack, match);
     }
-
 }
