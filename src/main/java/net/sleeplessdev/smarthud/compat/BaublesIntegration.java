@@ -10,7 +10,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.sleeplessdev.smarthud.SmartHUD;
-import net.sleeplessdev.smarthud.config.ModulesConfig;
 import net.sleeplessdev.smarthud.util.CachedItem;
 import net.sleeplessdev.smarthud.util.StackHelper;
 
@@ -32,14 +31,13 @@ public final class BaublesIntegration {
     protected static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         final IBaublesItemHandler handler = BaublesApi.getBaublesHandler(event.player);
         final int dim = event.player.dimension;
-        final boolean merge = ModulesConfig.HOTBAR_HUD.mergeDuplicates;
         final List<CachedItem> baubleCache = new ArrayList<>();
 
         for (int slot = 0; slot < handler.getSlots(); ++slot) {
             final ItemStack bauble = handler.getStackInSlot(slot).copy();
 
             if (!bauble.isEmpty() && StackHelper.isWhitelisted(bauble, dim)) {
-                StackHelper.processStack(baubleCache, bauble, merge);
+                StackHelper.processStack(baubleCache, bauble);
             }
         }
 

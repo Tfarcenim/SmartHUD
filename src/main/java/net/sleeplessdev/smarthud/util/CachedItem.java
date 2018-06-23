@@ -2,6 +2,7 @@ package net.sleeplessdev.smarthud.util;
 
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
+import net.sleeplessdev.smarthud.config.ModulesConfig;
 
 import java.util.function.IntPredicate;
 
@@ -14,6 +15,7 @@ public final class CachedItem {
 
     private boolean ignoreNBT = true;
     private boolean ignoreDmg = true;
+    private Boolean mergeDuplicates = null;
 
     private IntPredicate dimensionPredicate;
 
@@ -46,6 +48,10 @@ public final class CachedItem {
         return actualCount;
     }
 
+    public boolean isMergeDuplicates() {
+        return mergeDuplicates != null ? mergeDuplicates : ModulesConfig.HOTBAR_HUD.mergeDuplicates;
+    }
+
     public void setMetadata(int meta) {
         this.stack.setItemDamage(meta);
         this.meta = meta;
@@ -57,6 +63,10 @@ public final class CachedItem {
 
     public void setIgnoreDmg(boolean ignoreDmg) {
         this.ignoreDmg = ignoreDmg;
+    }
+
+    public void setMergeDuplicates(boolean mergeDuplicates) {
+        this.mergeDuplicates = mergeDuplicates;
     }
 
     public void setDimensionPredicate(IntPredicate predicate) {

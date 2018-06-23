@@ -73,7 +73,7 @@ public final class HotbarRender implements IRenderEvent {
                 RenderHelper.disableStandardItemLighting();
 
                 if (showStackSize) {
-                    final int count = ModulesConfig.HOTBAR_HUD.mergeDuplicates
+                    final int count = cachedItem.isMergeDuplicates()
                                       ? cachedItem.getCount()
                                       : cachedItem.getActualCount();
                     final int stringWidth = ctx.getStringWidth(Integer.toString(count));

@@ -17,13 +17,13 @@ public final class StackHelper {
         return false;
     }
 
-    public static void processStack(List<CachedItem> cache, ItemStack stack, boolean mergeDuplicates) {
+    public static void processStack(List<CachedItem> cache, ItemStack stack) {
         final int count = stack.getCount();
         boolean shouldCache = true;
 
 
         for (final CachedItem item : cache) {
-            if (item.matchesStack(stack, false) && mergeDuplicates) {
+            if (item.matchesStack(stack, false) && item.isMergeDuplicates()) {
                 item.setCount(item.getCount() + count);
                 shouldCache = false;
                 break;

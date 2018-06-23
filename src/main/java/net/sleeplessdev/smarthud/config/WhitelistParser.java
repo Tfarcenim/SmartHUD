@@ -111,9 +111,17 @@ public final class WhitelistParser {
                 } else cachedItem.setMetadata(meta);
             }
 
-            if (json.has("ignore_nbt")) cachedItem.setIgnoreNBT(json.get("ignore_nbt").getAsBoolean());
+            if (json.has("ignore_nbt")) {
+                cachedItem.setIgnoreNBT(json.get("ignore_nbt").getAsBoolean());
+            }
 
-            if (json.has("ignore_dmg")) cachedItem.setIgnoreDmg(json.get("ignore_dmg").getAsBoolean());
+            if (json.has("ignore_dmg")) {
+                cachedItem.setIgnoreDmg(json.get("ignore_dmg").getAsBoolean());
+            }
+
+            if (json.has("merge_duplicates")) {
+                cachedItem.setMergeDuplicates(json.get("merge_duplicates").getAsBoolean());
+            }
 
             if (json.has("dimensions")) {
                 final JsonArray array = json.get("dimensions").getAsJsonArray();

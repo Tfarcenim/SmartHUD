@@ -30,6 +30,7 @@ public final class ModulesConfig {
         public boolean alwaysShow = false;
         public HotbarStyle hudStyle = HotbarStyle.OFFHAND;
         public boolean isEnabled = true;
+        @Config.Comment("Global override for duplicate merging. Items in the whitelist can override this")
         public boolean mergeDuplicates = true;
         public boolean renderOverlays = true;
         public boolean showStackSize = false;
