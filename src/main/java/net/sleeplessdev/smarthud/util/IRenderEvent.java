@@ -1,5 +1,6 @@
 package net.sleeplessdev.smarthud.util;
 
+import lombok.NonNull;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 
 public interface IRenderEvent {
@@ -7,7 +8,7 @@ public interface IRenderEvent {
 
     RenderGameOverlayEvent.ElementType getType();
 
-    default void onRenderTickPre(RenderContext ctx) {}
+    default void onRenderTickPre(@NonNull final RenderContext ctx) {}
 
-    default void onRenderTickPost(RenderContext ctx) {}
+    default void onRenderTickPost(@NonNull final RenderContext ctx) {}
 }

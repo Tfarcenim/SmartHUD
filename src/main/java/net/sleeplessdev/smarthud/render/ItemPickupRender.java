@@ -1,6 +1,9 @@
 package net.sleeplessdev.smarthud.render;
 
 import com.google.common.collect.EvictingQueue;
+import lombok.NonNull;
+import lombok.experimental.var;
+import lombok.val;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
@@ -14,14 +17,11 @@ import net.sleeplessdev.smarthud.util.IRenderEvent;
 import net.sleeplessdev.smarthud.util.RenderContext;
 import net.sleeplessdev.smarthud.util.StringHelper;
 import net.sleeplessdev.smarthud.util.interpolation.CubicBezierInterpolator;
-
-import java.util.Iterator;
+import net.sleeplessdev.smarthud.util.interpolation.Interpolator;
 
 public final class ItemPickupRender implements IRenderEvent {
-    private static final CubicBezierInterpolator ANIMATION = new CubicBezierInterpolator(0.42D, 0.0D, 0.58D, 1.0D);
+    private static final Interpolator ANIMATION = new CubicBezierInterpolator(0.42D, 0.0D, 0.58D, 1.0D);
     private static final float ANIMATION_DURATION = 10.0F;
-
-    public ItemPickupRender() {}
 
     @Override
     public boolean canRender() {
@@ -34,16 +34,16 @@ public final class ItemPickupRender implements IRenderEvent {
     }
 
     @Override
-    public void onRenderTickPre(RenderContext ctx) {
+    public void onRenderTickPre(@NonNull final RenderContext ctx) {
         EvictingQueue<CachedItem> items = ItemPickupQueue.getItems();
         if (!items.isEmpty()) {
-            final int x = ModulesConfig.ITEM_PICKUP_HUD.hudStyle.hasItemIcon() ? 17 : 4;
-            final int y = ctx.getScreenHeight() - (ctx.getFontHeight() * items.size()) - (2 * items.size());
-            final Iterator<CachedItem> iterator = items.iterator();
+            val x = ModulesConfig.ITEM_PICKUP_HUD.hudStyle.hasIcon() ? 17 : 4;
+            val y = ctx.getScreenHeight() - (ctx.getFontHeight() * items.size()) - (2 * items.size());
+            val iterator = items.iterator();
 
-            for (int i = 0; iterator.hasNext(); ++i) {
-                final CachedItem cachedItem = iterator.next();
-                final int y1 = y + (ctx.getFontHeight() * i) + (2 * i);
+            for (var i = 0; iterator.hasNext(); ++i) {
+                val cachedItem = iterator.next();
+                val y1 = y + (ctx.getFontHeight() * i) + (2 * i);
 
                 if (renderLabel(ctx, x, y1, cachedItem)) {
                     iterator.remove();
@@ -52,26 +52,31 @@ public final class ItemPickupRender implements IRenderEvent {
         }
     }
 
-    private boolean renderLabel(RenderContext ctx, float renderX, float renderY, CachedItem item) {
-        final boolean name = ModulesConfig.ITEM_PICKUP_HUD.hudStyle.hasItemName();
-        final String key = "label." + SmartHUD.ID + ".pickup." + (name ? "long" : "short");
-        final String count = StringHelper.getAbbreviatedValue(item.getCount());
-        final String label = I18n.format(key, count, item.getName());
+    private boolean renderLabel(
+        @NonNull final RenderContext ctx,
+        final float renderX,
+        final float renderY,
+        @NonNull final CachedItem item
+    ) {
+        val name = ModulesConfig.ITEM_PICKUP_HUD.hudStyle.hasLabel();
+        val key = "label." + SmartHUD.ID + ".pickup." + (name ? "long" : "short");
+        val count = StringHelper.getAbbreviatedValue(item.getCount());
+        val label = I18n.format(key, count, item.getName());
 
-        final int color = 0xFFFFFF;
-        final int labelWidth = ctx.getStringWidth(label);
-        float labelX = HandHelper.handleVariableOffset(renderX, labelWidth);
-        float iconX = HandHelper.handleVariableOffset(renderX - 14.0F, 10.72F);
+        val color = 0xFFFFFF;
+        val labelWidth = ctx.getStringWidth(label);
+        var labelX = HandHelper.getSideOffset(renderX, labelWidth);
+        var iconX = HandHelper.getSideOffset(renderX - 14.0F, 10.72F);
 
         if (HandHelper.isLeftHanded()) {
             labelX += ctx.getScreenWidth();
             iconX += ctx.getScreenHeight();
         }
 
-        long remaining = item.getRemainingTicks(ModulesConfig.ITEM_PICKUP_HUD.displayTime);
+        val remaining = item.getRemainingTicks(ModulesConfig.ITEM_PICKUP_HUD.displayTime);
 
         if (remaining < 0) {
-            final float time = Math.abs(remaining) + ctx.getPartialTicks();
+            val time = Math.abs(remaining) + ctx.getPartialTicks();
             if (time > ItemPickupRender.ANIMATION_DURATION) return true;
             //            switch (ITEM_PICKUP_HUD.animationStyle) {
             //                case FADE:
@@ -79,8 +84,8 @@ public final class ItemPickupRender implements IRenderEvent {
             //                    color |= (int) alpha << 24; // FIXME
             //                    break;
             //                case GLIDE:
-            final float end = renderX + labelWidth;
-            final float interpolation = ItemPickupRender.ANIMATION
+            val end = renderX + labelWidth;
+            val interpolation = ItemPickupRender.ANIMATION
                 .interpolate(0, ItemPickupRender.ANIMATION_DURATION, time) * end;
             labelX += HandHelper.isLeftHanded() ? interpolation : -interpolation;
             iconX += HandHelper.isLeftHanded() ? interpolation : -interpolation;
@@ -90,7 +95,7 @@ public final class ItemPickupRender implements IRenderEvent {
 
         ctx.drawString(label, labelX, renderY, color);
 
-        if (ModulesConfig.ITEM_PICKUP_HUD.hudStyle.hasItemIcon()) {
+        if (ModulesConfig.ITEM_PICKUP_HUD.hudStyle.hasIcon()) {
             GlStateManager.enableAlpha();
             RenderHelper.enableGUIStandardItemLighting();
             GlStateManager.pushMatrix();

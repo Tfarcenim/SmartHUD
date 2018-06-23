@@ -1,19 +1,21 @@
 package net.sleeplessdev.smarthud.util;
 
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumHandSide;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@UtilityClass
 @SideOnly(Side.CLIENT)
-public final class HandHelper {
-    private HandHelper() {}
-
-    public static EnumHandSide getMainHand() {
+public class HandHelper {
+    @NonNull
+    public EnumHandSide getMainHand() {
         return Minecraft.getMinecraft().gameSettings.mainHand;
     }
 
-    public static boolean isLeftHanded() {
+    public boolean isLeftHanded() {
         return getMainHand() == EnumHandSide.LEFT;
     }
 
@@ -25,14 +27,15 @@ public final class HandHelper {
      * @param objectWidth   The current width of the element, used when inverting the position to the negative
      * @return The new offset depending on the current game setting
      */
-    public static float handleVariableOffset(float currentOffset, float objectWidth) {
+    public float getSideOffset(final float currentOffset, final float objectWidth) {
+        float offset = currentOffset;
         float newOffset = 0.0F;
 
         if (isLeftHanded()) {
-            currentOffset = -currentOffset;
+            offset = -currentOffset;
             newOffset = -objectWidth;
         }
 
-        return currentOffset + newOffset;
+        return offset + newOffset;
     }
 }

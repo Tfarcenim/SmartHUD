@@ -1,5 +1,7 @@
 package net.sleeplessdev.smarthud.util;
 
+import lombok.Getter;
+import lombok.NonNull;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.Entity;
@@ -10,77 +12,64 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+@Getter
 @SideOnly(Side.CLIENT)
 public final class RenderContext {
-    private final Minecraft minecraft;
-
+    private final Minecraft client;
     private final int screenWidth;
     private final int screenHeight;
-
     private final float partialTicks;
 
-    public RenderContext(Minecraft mc, RenderGameOverlayEvent event) {
-        minecraft = mc;
+    public RenderContext(@NonNull final Minecraft mc, @NonNull final RenderGameOverlayEvent event) {
+        client = mc;
         screenWidth = event.getResolution().getScaledWidth();
         screenHeight = event.getResolution().getScaledHeight();
         partialTicks = event.getPartialTicks();
     }
 
     public GameSettings getGameSettings() {
-        return minecraft.gameSettings;
+        return client.gameSettings;
     }
 
     public EntityPlayer getPlayer() {
-        return minecraft.player;
+        return client.player;
     }
 
     public Entity getRenderViewEntity() {
-        return minecraft.getRenderViewEntity();
+        return client.getRenderViewEntity();
     }
 
-    public int getScreenWidth() {
-        return screenWidth;
-    }
-
-    public int getScreenHeight() {
-        return screenHeight;
-    }
-
-    public float getPartialTicks() {
-        return partialTicks;
-    }
-
-    public int getStringWidth(String text) {
-        return minecraft.fontRenderer.getStringWidth(text);
+    public int getStringWidth(@NonNull final String text) {
+        return client.fontRenderer.getStringWidth(text);
     }
 
     public int getFontHeight() {
-        return minecraft.fontRenderer.FONT_HEIGHT;
+        return client.fontRenderer.FONT_HEIGHT;
     }
 
-    public void bindTexture(ResourceLocation texture) {
-        minecraft.getTextureManager().bindTexture(texture);
+    public void bindTexture(@NonNull final ResourceLocation texture) {
+        client.getTextureManager().bindTexture(texture);
     }
 
-    public void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height) {
-        minecraft.ingameGUI.drawTexturedModalRect(x, y, textureX, textureY, width, height);
+    public void drawTexturedModalRect(final int x, final int y, final int textureX, final int textureY, final int width, final int height) {
+        client.ingameGUI.drawTexturedModalRect(x, y, textureX, textureY, width, height);
     }
 
-    public void drawString(String text, float x, float y, int color) {
-        minecraft.fontRenderer.drawString(text, x, y, color, true);
+    public void drawString(@NonNull final String text, final float x, final float y, final int color) {
+        client.fontRenderer.drawString(text, x, y, color, true);
     }
 
-    public void drawString(String text, float x, float y) {
-        minecraft.fontRenderer.drawString(text, x, y, 0xFFFFFFFF, true);
+    public void drawString(@NonNull final String text, final float x, final float y) {
+        client.fontRenderer.drawString(text, x, y, 0xFFFFFFFF, true);
     }
 
-    public void renderItem(ItemStack stack, int x, int y, boolean includeEffect) {
+    public void renderItem(@NonNull final ItemStack stack, final int x, final int y, final boolean includeEffect) {
         if (includeEffect) {
-            minecraft.getRenderItem().renderItemAndEffectIntoGUI(stack, x, y);
-        } else minecraft.getRenderItem().renderItemIntoGUI(stack, x, y);
+            client.getRenderItem().renderItemAndEffectIntoGUI(stack, x, y);
+        } else client.getRenderItem().renderItemIntoGUI(stack, x, y);
     }
 
-    public void renderItemOverlays(ItemStack stack, int x, int y) {
-        minecraft.getRenderItem().renderItemOverlays(minecraft.fontRenderer, stack, x, y);
+    public void renderItemOverlays(@NonNull final ItemStack stack, final int x, final int y) {
+        client.getRenderItem().renderItemOverlays(client.fontRenderer, stack, x, y);
     }
 }

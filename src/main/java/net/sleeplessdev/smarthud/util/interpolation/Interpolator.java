@@ -8,9 +8,9 @@ public interface Interpolator {
      * @param time A time value, must be 0..1
      * @return The interpolated value. Can be thought of as 'y' where time is 'x'.
      */
-    float interpolate(float time);
+    float interpolate(final float time);
 
-    default float interpolate(float min, float max, float x) {
+    default float interpolate(final float min, final float max, final float x) {
         return interpolate((x - min) / (max - min));
     }
 }

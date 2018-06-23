@@ -1,5 +1,6 @@
 package net.sleeplessdev.smarthud.util.interpolation;
 
+import lombok.NonNull;
 import org.lwjgl.util.vector.Vector2f;
 
 /**
@@ -9,15 +10,18 @@ import org.lwjgl.util.vector.Vector2f;
  * interpolation of a 0..1 time value.
  */
 
-public class CubicBezierInterpolator implements Interpolator {
-    private final Vector2f start, end;
+public final class CubicBezierInterpolator implements Interpolator {
+    private final Vector2f start;
+    private final Vector2f end;
 
     // Calculation storage to avoid unnecessary instantiation
     private final Vector2f a = new Vector2f();
     private final Vector2f b = new Vector2f();
     private final Vector2f c = new Vector2f();
 
-    public CubicBezierInterpolator(Vector2f start, Vector2f end) throws IllegalArgumentException {
+    public CubicBezierInterpolator(
+        @NonNull final Vector2f start, @NonNull final Vector2f end
+    ) throws IllegalArgumentException {
         if (start.x < 0 || start.x > 1) {
             throw new IllegalArgumentException("start X value must be in the range [0, 1]");
         }
@@ -30,20 +34,20 @@ public class CubicBezierInterpolator implements Interpolator {
         this.end = end;
     }
 
-    public CubicBezierInterpolator(float startX, float startY, float endX, float endY) {
+    public CubicBezierInterpolator(final float startX, final float startY, final float endX, final float endY) {
         this(new Vector2f(startX, startY), new Vector2f(endX, endY));
     }
 
-    public CubicBezierInterpolator(double startX, double startY, double endX, double endY) {
+    public CubicBezierInterpolator(final double startX, final double startY, final double endX, final double endY) {
         this((float) startX, (float) startY, (float) endX, (float) endY);
     }
 
     @Override
-    public float interpolate(float time) {
+    public float interpolate(final float time) {
         return getBezierCoordinateY(getXForTime(time));
     }
 
-    protected float getBezierCoordinateY(float time) {
+    protected float getBezierCoordinateY(final float time) {
         c.y = 3 * start.y;
         b.y = 3 * (end.y - start.y) - c.y;
         a.y = 1 - c.y - b.y;
@@ -51,7 +55,7 @@ public class CubicBezierInterpolator implements Interpolator {
         return time * (c.y + time * (b.y + time * a.y));
     }
 
-    protected float getXForTime(float time) {
+    protected float getXForTime(final float time) {
         float x = time;
         float z;
 
@@ -66,11 +70,11 @@ public class CubicBezierInterpolator implements Interpolator {
         return x;
     }
 
-    private float getSlope(float t) {
+    private float getSlope(final float t) {
         return c.x + t * (2 * b.x + 3 * a.x * t);
     }
 
-    private float getBezierCoordinateX(float time) {
+    private float getBezierCoordinateX(final float time) {
         c.x = 3 * start.x;
         b.x = 3 * (end.x - start.x) - c.x;
         a.x = 1 - c.x - b.x;

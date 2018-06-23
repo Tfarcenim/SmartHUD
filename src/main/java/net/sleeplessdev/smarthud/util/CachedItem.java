@@ -1,25 +1,31 @@
 package net.sleeplessdev.smarthud.util;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.val;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 import net.sleeplessdev.smarthud.config.ModulesConfig;
 
 import java.util.function.IntPredicate;
 
-public final class CachedItem {
-    private final ItemStack stack;
-    private final int actualCount;
-    private int meta = OreDictionary.WILDCARD_VALUE;
-    private int count;
-    private long timestamp;
 
-    private boolean ignoreNBT = true;
-    private boolean ignoreDmg = true;
+public final class CachedItem {
+    @Getter private final ItemStack stack;
+    @Getter private final int actualCount;
+    @Getter private int meta = OreDictionary.WILDCARD_VALUE;
+    @Getter @Setter private int count;
+    @Getter private long timestamp;
+
+    @Getter @Setter private boolean ignoreNBT = true;
+    @Getter @Setter private boolean ignoreDmg = true;
+
     private Boolean mergeDuplicates = null;
 
     private IntPredicate dimensionPredicate;
 
-    public CachedItem(ItemStack stack, int count) {
+    public CachedItem(@NonNull final ItemStack stack, final int count) {
         this.stack = stack.copy();
         this.actualCount = stack.getCount();
         this.stack.setCount(1);
@@ -28,48 +34,24 @@ public final class CachedItem {
         this.dimensionPredicate = i -> true;
     }
 
-    public CachedItem(ItemStack stack) {
+    public CachedItem(@NonNull final ItemStack stack) {
         this(stack, 1);
-    }
-
-    public ItemStack getStack() {
-        return stack;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
-
-    public int getActualCount() {
-        return actualCount;
     }
 
     public boolean isMergeDuplicates() {
         return mergeDuplicates != null ? mergeDuplicates : ModulesConfig.HOTBAR_HUD.mergeDuplicates;
     }
 
-    public void setMetadata(int meta) {
+    public void setMergeDuplicates(final boolean mergeDuplicates) {
+        this.mergeDuplicates = mergeDuplicates;
+    }
+
+    public void setMetadata(final int meta) {
         this.stack.setItemDamage(meta);
         this.meta = meta;
     }
 
-    public void setIgnoreNBT(boolean ignoreNBT) {
-        this.ignoreNBT = ignoreNBT;
-    }
-
-    public void setIgnoreDmg(boolean ignoreDmg) {
-        this.ignoreDmg = ignoreDmg;
-    }
-
-    public void setMergeDuplicates(boolean mergeDuplicates) {
-        this.mergeDuplicates = mergeDuplicates;
-    }
-
-    public void setDimensionPredicate(IntPredicate predicate) {
+    public void setDimensionPredicate(@NonNull final IntPredicate predicate) {
         this.dimensionPredicate = predicate;
     }
 
@@ -81,28 +63,29 @@ public final class CachedItem {
         return stack.getDisplayName();
     }
 
-    public long getRemainingTicks(int cooldown) {
+    public long getRemainingTicks(final int cooldown) {
         long time = TickListener.getTicksElapsed();
         return (timestamp + cooldown / 50) - time;
     }
 
-    public boolean matchesDimension(int dimension) {
+    public boolean matchesDimension(final int dimension) {
         return dimensionPredicate.test(dimension);
     }
 
-    public boolean matchesStack(ItemStack stack, boolean fuzzy) {
-        final ItemStack match = stack.copy();
+    // TODO Clean this the fuck up
+    public boolean matchesStack(@NonNull final ItemStack stack, final boolean fuzzy) {
+        val match = stack.copy();
 
         match.setCount(1);
 
         if (!fuzzy) {
-            boolean isItemEqual = ignoreDmg
-                                  ? ItemStack.areItemsEqualIgnoreDurability(this.stack, match)
-                                  : ItemStack.areItemsEqual(this.stack, match);
-            boolean isNBTEqual = ignoreNBT || ItemStack.areItemStackTagsEqual(this.stack, match);
+            val isItemEqual = ignoreDmg
+                              ? ItemStack.areItemsEqualIgnoreDurability(this.stack, match)
+                              : ItemStack.areItemsEqual(this.stack, match);
+            val isNBTEqual = ignoreNBT || ItemStack.areItemStackTagsEqual(this.stack, match);
             return isItemEqual && isNBTEqual;
-        } else return this.meta == OreDictionary.WILDCARD_VALUE
-                      ? this.stack.getItem() == match.getItem()
-                      : ItemStack.areItemsEqualIgnoreDurability(this.stack, match);
+        } else if (this.meta == OreDictionary.WILDCARD_VALUE) {
+            return this.stack.getItem() == match.getItem();
+        } else return ItemStack.areItemsEqualIgnoreDurability(this.stack, match);
     }
 }
