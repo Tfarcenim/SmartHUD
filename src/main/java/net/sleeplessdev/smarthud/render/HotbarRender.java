@@ -119,8 +119,8 @@ public final class HotbarRender implements IRenderEvent {
                     GlStateManager.enableRescaleNormal();
                     GlStateManager.enableBlend();
                     GlStateManager.tryBlendFuncSeparate(
-                            SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA,
-                            SourceFactor.ONE, DestFactor.ZERO
+                        SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA,
+                        SourceFactor.ONE, DestFactor.ZERO
                     );
 
                     RenderHelper.enableGUIStandardItemLighting();

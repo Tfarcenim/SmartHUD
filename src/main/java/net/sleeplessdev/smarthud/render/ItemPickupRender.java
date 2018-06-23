@@ -81,7 +81,7 @@ public final class ItemPickupRender implements IRenderEvent {
             //                case GLIDE:
             final float end = renderX + labelWidth;
             final float interpolation = ItemPickupRender.ANIMATION
-                    .interpolate(0, ItemPickupRender.ANIMATION_DURATION, time) * end;
+                .interpolate(0, ItemPickupRender.ANIMATION_DURATION, time) * end;
             labelX += HandHelper.isLeftHanded() ? interpolation : -interpolation;
             iconX += HandHelper.isLeftHanded() ? interpolation : -interpolation;
             //                    break;

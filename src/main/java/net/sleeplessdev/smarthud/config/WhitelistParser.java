@@ -59,7 +59,7 @@ public final class WhitelistParser {
         }
 
         final Stopwatch stopwatch = Stopwatch.createStarted();
-        final  List<String> missingEntries = new ArrayList<>();
+        final List<String> missingEntries = new ArrayList<>();
         final JsonElement file;
 
         try (final InputStreamReader reader = new InputStreamReader(new FileInputStream(getOrGenerateJson()))) {
@@ -127,9 +127,9 @@ public final class WhitelistParser {
                 } else {
                     final int index = i;
                     final IntOpenHashSet dimensions = Stream.of(array)
-                            .map(JsonArray::getAsInt)
-                            .filter(dim -> WhitelistParser.testDimension(dim, index))
-                            .collect(Collectors.toCollection(IntOpenHashSet::new));
+                        .map(JsonArray::getAsInt)
+                        .filter(dim -> WhitelistParser.testDimension(dim, index))
+                        .collect(Collectors.toCollection(IntOpenHashSet::new));
 
                     cachedItem.setDimensionPredicate(dimensions::contains);
                 }

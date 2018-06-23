@@ -39,7 +39,7 @@ public final class InventoryCache {
 
         if (!baubles.isEmpty()) inventoryCache.addAll(baubles);
 
-       InventoryCache.inventory = inventoryCache;
+        InventoryCache.inventory = inventoryCache;
     }
 
     public static ImmutableList<CachedItem> getInventory() {

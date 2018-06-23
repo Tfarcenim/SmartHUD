@@ -18,7 +18,7 @@ import java.util.List;
 @Mod.EventBusSubscriber(modid = SmartHUD.ID, value = Side.CLIENT)
 public final class RenderManager {
     private static final List<IRenderEvent> RENDER_EVENTS = Lists.newArrayList(
-            new HotbarRender(), new ItemPickupRender()
+        new HotbarRender(), new ItemPickupRender()
     );
 
     private RenderManager() {}
@@ -34,7 +34,7 @@ public final class RenderManager {
 
     @SubscribeEvent
     protected static void onRenderGameOverlayPost(RenderGameOverlayEvent.Post event) {
-        final  Minecraft mc = FMLClientHandler.instance().getClient();
+        final Minecraft mc = FMLClientHandler.instance().getClient();
         final RenderContext ctx = new RenderContext(mc, event);
 
         for (final IRenderEvent render : RenderManager.RENDER_EVENTS) {

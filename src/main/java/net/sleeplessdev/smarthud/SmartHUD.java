@@ -11,12 +11,12 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 
 @Mod(
-        modid = SmartHUD.ID,
-        name = SmartHUD.NAME,
-        version = SmartHUD.VERSION,
-        dependencies = SmartHUD.DEPENDENCIES,
-        acceptedMinecraftVersions = SmartHUD.MC_VERSIONS,
-        clientSideOnly = true
+    modid = SmartHUD.ID,
+    name = SmartHUD.NAME,
+    version = SmartHUD.VERSION,
+    dependencies = SmartHUD.DEPENDENCIES,
+    acceptedMinecraftVersions = SmartHUD.MC_VERSIONS,
+    clientSideOnly = true
 )
 public final class SmartHUD {
     public static final String ID = "smarthud";
@@ -28,6 +28,10 @@ public final class SmartHUD {
     public static final Logger LOGGER = LogManager.getLogger(SmartHUD.NAME);
 
     private static File configPath;
+
+    public static File getConfigPath() {
+        return SmartHUD.configPath;
+    }
 
     @Mod.EventHandler
     public void onPreInit(FMLPreInitializationEvent event) {
@@ -41,9 +45,5 @@ public final class SmartHUD {
     public void onPostInit(FMLPostInitializationEvent event) {
         WhitelistParser.reloadWhitelistEntries();
         ItemPickupQueue.initialize();
-    }
-
-    public static File getConfigPath() {
-        return SmartHUD.configPath;
     }
 }
