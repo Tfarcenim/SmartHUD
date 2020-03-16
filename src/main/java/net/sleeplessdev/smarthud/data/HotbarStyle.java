@@ -8,5 +8,5 @@ public enum HotbarStyle {
     HotbarStyle(int textureY){
         this.textureY = textureY;
     }
-    private final int textureY;
+    public final int textureY;
 }

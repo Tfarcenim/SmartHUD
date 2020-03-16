@@ -1,7 +1,7 @@
 package net.sleeplessdev.smarthud.util.interpolation;
 
-import lombok.NonNull;
-import org.lwjgl.util.vector.Vector2f;
+
+import javax.vecmath.Vector2f;
 
 /**
  * Derived from: https://github.com/codesoup/android-cubic-bezier-interpolator
@@ -20,7 +20,7 @@ public final class CubicBezierInterpolator implements Interpolator {
     private final Vector2f c = new Vector2f();
 
     public CubicBezierInterpolator(
-        @NonNull final Vector2f start, @NonNull final Vector2f end
+        final Vector2f start, final Vector2f end
     ) throws IllegalArgumentException {
         if (start.x < 0 || start.x > 1) {
             throw new IllegalArgumentException("start X value must be in the range [0, 1]");

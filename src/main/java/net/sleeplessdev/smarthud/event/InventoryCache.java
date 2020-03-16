@@ -1,52 +1,43 @@
 package net.sleeplessdev.smarthud.event;
 
 import com.google.common.collect.ImmutableList;
-import lombok.NonNull;
-import lombok.experimental.UtilityClass;
-import lombok.experimental.var;
-import lombok.val;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.sleeplessdev.smarthud.SmartHUD;
-import net.sleeplessdev.smarthud.compat.BaublesIntegration;
 import net.sleeplessdev.smarthud.util.CachedItem;
 import net.sleeplessdev.smarthud.util.StackHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@UtilityClass
 @EventBusSubscriber(modid = SmartHUD.ID, value = Dist.CLIENT)
 public class InventoryCache {
-    private List<CachedItem> inventory = new ArrayList<>();
+    private static List<CachedItem> inventory = new ArrayList<>();
 
     @SubscribeEvent
-    void onPlayerTick(@NonNull final TickEvent.PlayerTickEvent event) {
-        @NonNull val player = event.player;
-        @NonNull val inv = player.inventory.mainInventory;
-        val inventoryCache = new ArrayList<CachedItem>();
-        val dim = player.dimension;
+    void onPlayerTick(final TickEvent.PlayerTickEvent event) {
+        PlayerEntity player = event.player;
+        List<ItemStack> inv = player.inventory.mainInventory;
+        List<CachedItem> inventoryCache = new ArrayList<>();
+        DimensionType dim = player.dimension;
 
-        for (var slot = 9; slot < 36; ++slot) {
-            val stack = inv.get(slot).copy();
+        for (int slot = 9; slot < 36; ++slot) {
+            ItemStack stack = inv.get(slot).copy();
 
             if (!stack.isEmpty() && StackHelper.isWhitelisted(stack, dim)) {
                 StackHelper.process(inventoryCache, stack);
             }
         }
 
-        val baubles = BaublesIntegration.getBaubles();
-
-        if (!baubles.isEmpty()) {
-            inventoryCache.addAll(baubles);
-        }
-
         inventory = inventoryCache;
     }
 
-    public ImmutableList<CachedItem> getInventory() {
+    public static ImmutableList<CachedItem> getInventory() {
         return ImmutableList.copyOf(inventory);
     }
 }

@@ -6,7 +6,7 @@ public class StringHelper {
      * @param value The number you want to abbreviate
      * @return The abbreviated number
      */
-    public String getAbbreviatedValue(final int value) {
+    public static String getAbbreviatedValue(final int value) {
         StringBuilder builder = new StringBuilder();
         int magnitude = (int) Math.floor(Math.log(value) / Math.log(1000.0D));
         int num = (int) (value / Math.pow(1000.0D, magnitude) * 10.0D);

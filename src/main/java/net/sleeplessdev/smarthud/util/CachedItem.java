@@ -2,14 +2,15 @@ package net.sleeplessdev.smarthud.util;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.dimension.DimensionType;
 import net.sleeplessdev.smarthud.config.ModulesConfig;
 
-import java.util.function.IntPredicate;
+import java.util.function.Predicate;
 
 
 public final class CachedItem {
-    private final ItemStack stack;
-    private final int actualCount;
+    public final ItemStack stack;
+    public final int actualCount;
     public int count;
     private long timestamp;
 
@@ -18,7 +19,7 @@ public final class CachedItem {
 
     private Boolean mergeDuplicates = null;
 
-    private IntPredicate dimensionPredicate;
+    private Predicate<DimensionType> dimensionPredicate;
 
     public CachedItem(final ItemStack stack, final int count) {
         this.stack = stack.copy();
@@ -42,7 +43,7 @@ public final class CachedItem {
     }
 
 
-    public void setDimensionPredicate(final IntPredicate predicate) {
+    public void setDimensionPredicate(final Predicate<DimensionType> predicate) {
         this.dimensionPredicate = predicate;
     }
 
@@ -59,7 +60,7 @@ public final class CachedItem {
         return (timestamp + cooldown / 50) - time;
     }
 
-    public boolean matchesDimension(final int dimension) {
+    public boolean matchesDimension(final DimensionType dimension) {
         return dimensionPredicate.test(dimension);
     }
 

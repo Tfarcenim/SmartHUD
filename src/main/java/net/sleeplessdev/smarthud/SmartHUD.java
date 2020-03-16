@@ -4,6 +4,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLPaths;
 import net.sleeplessdev.smarthud.config.WhitelistParser;
 import net.sleeplessdev.smarthud.event.ItemPickupQueue;
 import org.apache.logging.log4j.LogManager;
@@ -29,7 +30,7 @@ public final class SmartHUD {
 	public static File configPath;
 
 	void onPreInit(FMLClientSetupEvent event) {
-		File dir = event.getModConfigurationDirectory();
+		File dir = FMLPaths.CONFIGDIR.get().toFile();//event.getModConfigurationDirectory();
 		configPath = new File(dir, SmartHUD.ID);
 		if (!configPath.exists() && configPath.mkdirs()) {
 			LOGGER.debug("Pre-generated configuration directory");

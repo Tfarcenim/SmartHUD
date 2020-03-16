@@ -22,13 +22,14 @@ import net.sleeplessdev.smarthud.util.CachedItem;
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
 import java.util.Queue;
 
 import static net.sleeplessdev.smarthud.config.ModulesConfig.ITEM_PICKUP_HUD;
 
 @EventBusSubscriber(modid = SmartHUD.ID, value = Dist.CLIENT)
 public class ItemPickupQueue {
-    public EvictingQueue<CachedItem> items =
+    public static EvictingQueue<CachedItem> items =
         EvictingQueue.create(ITEM_PICKUP_HUD.itemLimit);
 
     private static boolean init = false;
@@ -41,19 +42,19 @@ public class ItemPickupQueue {
         reloadQueue();
     }
 
-    private EvictingQueue<CachedItem> createNewQueue() {
+    private static EvictingQueue<CachedItem> createNewQueue() {
         return EvictingQueue.create(ITEM_PICKUP_HUD.itemLimit);
     }
 
-    private void reloadQueue() {
-        val newQueue = createNewQueue();
+    private static void reloadQueue() {
+        EvictingQueue<CachedItem> newQueue = createNewQueue();
         if (newQueue.addAll(ItemPickupQueue.items)) {
             ItemPickupQueue.items = newQueue;
         } else throw new IllegalStateException("Unable to populate new queue");
     }
 
     @SubscribeEvent
-    void onConfigChanged(@NonNull final OnConfigChangedEvent event) {
+    void onConfigChanged(final OnConfigChangedEvent event) {
         if (SmartHUD.ID.equals(event.getModID())) {
             reloadQueue();
         }
@@ -61,24 +62,24 @@ public class ItemPickupQueue {
 
     private static void initializeParticleQueue() {
         try {
-            val field = ReflectionHelper.findField(ParticleManager.class, "field_187241_h", "queue");
-            val lookup = MethodHandles.lookup();
-            val itemGetter = getParticleItemPickupGetter(lookup, "field_174840_a", "item");
-            val targetGetter = getParticleItemPickupGetter(lookup, "field_174843_ax", "target");
-            val particleManager = Minecraft.getMinecraft().effectRenderer;
-            @SuppressWarnings("unchecked") val newQueue = (Queue<Particle>) field.get(particleManager);
+            Field field = ObfuscationReflectionHelper.findField(ParticleManager.class, "field_187241_h");//"queue"
+            MethodHandles.Lookup lookup = MethodHandles.lookup();
+            MethodHandle itemGetter = getParticleItemPickupGetter(lookup, "field_174840_a");//"item"
+            MethodHandle targetGetter = getParticleItemPickupGetter(lookup, "field_174843_ax");//"target"
+            ParticleManager particleManager = Minecraft.getInstance().particles;
+            @SuppressWarnings("unchecked") Queue<Particle> newQueue = (Queue<Particle>) field.get(particleManager);
             field.set(particleManager, createForwardingParticleQueue(newQueue, itemGetter, targetGetter));
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private MethodHandle getParticleItemPickupGetter(final MethodHandles.Lookup lookup, final String fieldName
+    private static MethodHandle getParticleItemPickupGetter(final MethodHandles.Lookup lookup, final String fieldName
     ) throws IllegalAccessException {
         return lookup.unreflectGetter(ObfuscationReflectionHelper.findField(ItemPickupParticle.class, fieldName));
     }
 
-    private Queue<Particle> createForwardingParticleQueue(
+    private static Queue<Particle> createForwardingParticleQueue(
             final Queue<Particle> delegate,
         final MethodHandle itemGetter,
         final MethodHandle targetGetter
@@ -93,8 +94,8 @@ public class ItemPickupQueue {
             public boolean add(@Nullable final Particle particle) {
                 if (!super.add(particle)) return false;
                 if (particle != null && ItemPickupParticle.class.equals(particle.getClass())) {
-                    @NonNull final Entity item;
-                    @NonNull final Entity target;
+                    final Entity item;
+                    final Entity target;
                     try {
                         item = (Entity) itemGetter.invoke(particle);
                         target = (Entity) targetGetter.invoke(particle);
@@ -111,23 +112,23 @@ public class ItemPickupQueue {
         };
     }
 
-    private void handleItemCollection(@NonNull final ItemStack stack) {
+    private static void handleItemCollection(final ItemStack stack) {
         if (stack.isEmpty()) return;
-        val newItems = createNewQueue();
+        EvictingQueue<CachedItem> newItems = createNewQueue();
         newItems.addAll(ItemPickupQueue.items);
         if (ItemPickupQueue.items.isEmpty()) {
             newItems.add(new CachedItem(stack, stack.getCount()));
         } else {
-            var shouldCache = true;
-            for (val cachedItem : ItemPickupQueue.items) {
+            boolean shouldCache = true;
+            for (CachedItem cachedItem : ItemPickupQueue.items) {
                 if (cachedItem.matchesStack(stack, true)) {
-                    val count = cachedItem.getCount() + stack.getCount();
+                    int count = cachedItem.count + stack.getCount();
                     if (ITEM_PICKUP_HUD.priorityMode == 0) {
                         newItems.remove(cachedItem);
                         newItems.add(new CachedItem(stack, count));
                         shouldCache = false;
                     } else if (ITEM_PICKUP_HUD.priorityMode == 1) {
-                        cachedItem.setCount(count);
+                        cachedItem.count = count;
                         cachedItem.renewTimestamp();
                         shouldCache = false;
                     }

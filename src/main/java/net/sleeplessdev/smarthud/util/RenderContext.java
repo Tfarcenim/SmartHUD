@@ -10,14 +10,14 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 
 public final class RenderContext {
     private final Minecraft client;
-    private final int screenWidth;
-    private final int screenHeight;
-    private final float partialTicks;
+    public final int screenWidth;
+    public final int screenHeight;
+    public final float partialTicks;
 
-    public RenderContext(@NonNull final Minecraft mc, @NonNull final RenderGameOverlayEvent event) {
+    public RenderContext(final Minecraft mc, final RenderGameOverlayEvent event) {
         client = mc;
-        screenWidth = event.getResolution().getScaledWidth();
-        screenHeight = event.getResolution().getScaledHeight();
+        screenWidth = mc.mainWindow.getScaledWidth();
+        screenHeight = mc.mainWindow.getScaledHeight();
         partialTicks = event.getPartialTicks();
     }
 
@@ -33,7 +33,7 @@ public final class RenderContext {
         return client.getRenderViewEntity();
     }
 
-    public int getStringWidth(@NonNull final String text) {
+    public int getStringWidth(final String text) {
         return client.fontRenderer.getStringWidth(text);
     }
 
@@ -41,29 +41,29 @@ public final class RenderContext {
         return client.fontRenderer.FONT_HEIGHT;
     }
 
-    public void bindTexture(@NonNull final ResourceLocation texture) {
+    public void bindTexture(final ResourceLocation texture) {
         client.getTextureManager().bindTexture(texture);
     }
 
     public void drawTexturedModalRect(final int x, final int y, final int textureX, final int textureY, final int width, final int height) {
-        client.ingameGUI.drawTexturedModalRect(x, y, textureX, textureY, width, height);
+        client.ingameGUI.blit(x, y, textureX, textureY, width, height);
     }
 
-    public void drawString(@NonNull final String text, final float x, final float y, final int color) {
-        client.fontRenderer.drawString(text, x, y, color, true);
+    public void drawStringWithShadow(final String text, final float x, final float y, final int color) {
+        client.fontRenderer.drawStringWithShadow(text, x, y, color);
     }
 
-    public void drawString(@NonNull final String text, final float x, final float y) {
-        client.fontRenderer.drawString(text, x, y, 0xFFFFFFFF, true);
+    public void drawStringWithShadow(final String text, final float x, final float y) {
+        client.fontRenderer.drawStringWithShadow(text, x, y, 0xFFFFFFFF);
     }
 
-    public void renderItem(@NonNull final ItemStack stack, final int x, final int y, final boolean includeEffect) {
+    public void renderItem(final ItemStack stack, final int x, final int y, final boolean includeEffect) {
         if (includeEffect) {
-            client.getRenderItem().renderItemAndEffectIntoGUI(stack, x, y);
-        } else client.getRenderItem().renderItemIntoGUI(stack, x, y);
+            client.getItemRenderer().renderItemAndEffectIntoGUI(stack, x, y);
+        } else client.getItemRenderer().renderItemIntoGUI(stack, x, y);
     }
 
-    public void renderItemOverlays(@NonNull final ItemStack stack, final int x, final int y) {
-        client.getRenderItem().renderItemOverlays(client.fontRenderer, stack, x, y);
+    public void renderItemOverlays(final ItemStack stack, final int x, final int y) {
+        client.getItemRenderer().renderItemOverlays(client.fontRenderer, stack, x, y);
     }
 }

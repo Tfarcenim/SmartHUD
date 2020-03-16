@@ -1,28 +1,26 @@
 package net.sleeplessdev.smarthud.render;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import lombok.NonNull;
-import lombok.experimental.var;
-import lombok.val;
 import net.minecraft.client.gui.AbstractGui;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.settings.AttackIndicatorStatus;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.HandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.sleeplessdev.smarthud.SmartHUD;
 import net.sleeplessdev.smarthud.data.HotbarStyle;
 import net.sleeplessdev.smarthud.event.InventoryCache;
-import net.sleeplessdev.smarthud.util.HandHelper;
-import net.sleeplessdev.smarthud.util.IRenderEvent;
-import net.sleeplessdev.smarthud.util.RenderContext;
-import net.sleeplessdev.smarthud.util.StringHelper;
+import net.sleeplessdev.smarthud.util.*;
+
+import java.util.List;
 
 import static net.sleeplessdev.smarthud.config.ModulesConfig.HOTBAR_HUD;
 
-public final class HotbarRender implements IRenderEvent {
+public final class HotbarRender implements RenderEvent {
     private static final ResourceLocation HUD_ELEMENTS = new ResourceLocation(SmartHUD.ID, "textures/hud/elements.png");
 
     @Override
@@ -36,31 +34,31 @@ public final class HotbarRender implements IRenderEvent {
     }
 
     @Override
-    public void onRenderTickPre(@NonNull final RenderContext ctx) {
-        val cachedItems = InventoryCache.getInventory();
-        val slots = cachedItems.size() >= HOTBAR_HUD.slotLimit
+    public void onRenderTickPre(final RenderContext ctx) {
+        List<CachedItem> cachedItems = InventoryCache.getInventory();
+        int slots = cachedItems.size() >= HOTBAR_HUD.slotLimit
                     ? HOTBAR_HUD.slotLimit
                     : cachedItems.size();
-        val center = ctx.getScreenWidth() / 2;
-        val baseOffset = 98;
+        int center = ctx.screenWidth / 2;
+        int baseOffset = 98;
 
         if (cachedItems.size() > 0) {
             if (HOTBAR_HUD.hudStyle != HotbarStyle.INVISIBLE) {
-                val width = 44 + (20 * (cachedItems.size() - 2)) - 2;
-                val offset = (int) HandHelper.getSideOffset(baseOffset, width);
+                int width = 44 + (20 * (cachedItems.size() - 2)) - 2;
+                int offset = (int) HandHelper.getSideOffset(baseOffset, width);
 
-                renderHotbarBackground(ctx, center + offset, ctx.getScreenHeight() - 22, slots);
+                renderHotbarBackground(ctx, center + offset, ctx.screenHeight - 22, slots);
             }
 
-            for (var i = 0; i < slots; i++) {
-                val cachedItem = cachedItems.get(i);
-                val stack = cachedItem.getStack();
-                val stackOffset = baseOffset + 3 + (20 * i);
-                val stackX = center + (int) HandHelper.getSideOffset(stackOffset, 16.0F);
-                val stackY = ctx.getScreenHeight() - (16 + 3);
+            for (int i = 0; i < slots; i++) {
+                CachedItem cachedItem = cachedItems.get(i);
+                ItemStack stack = cachedItem.stack;
+                int stackOffset = baseOffset + 3 + (20 * i);
+                int stackX = center + (int) HandHelper.getSideOffset(stackOffset, 16.0F);
+                int stackY = ctx.screenHeight - 19;
 
-                val renderOverlay = !stack.isStackable() && HOTBAR_HUD.renderOverlays;
-                val showStackSize = cachedItem.getCount() > 1 && HOTBAR_HUD.showStackSize;
+                boolean renderOverlay = !stack.isStackable() && HOTBAR_HUD.renderOverlays;
+                boolean showStackSize = cachedItem.count > 1 && HOTBAR_HUD.showStackSize;
 
                 RenderHelper.enableGUIStandardItemLighting();
                 ctx.renderItem(stack, stackX, stackY, true);
@@ -72,59 +70,59 @@ public final class HotbarRender implements IRenderEvent {
                 RenderHelper.disableStandardItemLighting();
 
                 if (showStackSize) {
-                    val count = cachedItem.isMergeDuplicates()
-                                ? cachedItem.getCount()
-                                : cachedItem.getActualCount();
-                    val stringWidth = ctx.getStringWidth(Integer.toString(count));
-                    val labelOffset = baseOffset + (20 - stringWidth) + (20 * i);
+                    int count = cachedItem.isMergeDuplicates()
+                                ? cachedItem.count
+                                : cachedItem.actualCount;
+                    int stringWidth = ctx.getStringWidth(Integer.toString(count));
+                    int labelOffset = baseOffset + (20 - stringWidth) + (20 * i);
 
-                    var labelX = (int) (center + HandHelper.getSideOffset(labelOffset, stringWidth));
-                    var labelY = ctx.getScreenHeight() - ctx.getFontHeight() - 1;
+                    int labelX = (int) (center + HandHelper.getSideOffset(labelOffset, stringWidth));
+                    int labelY = ctx.screenHeight - ctx.getFontHeight() - 1;
 
                     if (labelX < center) labelX += 18 - stringWidth;
                     // Keeps string to right edge of slot in left-handed mode
 
-                    GlStateManager.disableDepth();
-                    ctx.drawString(StringHelper.getAbbreviatedValue(count), labelX, labelY);
+                    GlStateManager.disableDepthTest();
+                    ctx.drawStringWithShadow(StringHelper.getAbbreviatedValue(count), labelX, labelY);
                 }
             }
         } else if (HOTBAR_HUD.alwaysShow && HOTBAR_HUD.hudStyle != HotbarStyle.INVISIBLE) {
-            val offset = (int) HandHelper.getSideOffset(baseOffset, 20.0F);
+            int offset = (int) HandHelper.getSideOffset(baseOffset, 20.0F);
 
-            renderHotbarBackground(ctx, center + offset, ctx.getScreenHeight() - 22, 1);
+            renderHotbarBackground(ctx, center + offset, ctx.screenHeight - 22, 1);
         }
 
-        if (ctx.getGameSettings().attackIndicator == 2) {
-            ctx.getGameSettings().attackIndicator = Integer.MIN_VALUE;
+        if (ctx.getGameSettings().attackIndicator == AttackIndicatorStatus.HOTBAR) {
+            ctx.getGameSettings().attackIndicator = AttackIndicatorStatus.OFF;//todo
         }
     }
 
     @Override
-    public void onRenderTickPost(@NonNull final RenderContext ctx) {
-        if (ctx.getGameSettings().attackIndicator == Integer.MIN_VALUE) {
+    public void onRenderTickPost(final RenderContext ctx) {
+        if (ctx.getGameSettings().attackIndicator == AttackIndicatorStatus.OFF) {//todo
             if (ctx.getRenderViewEntity() instanceof PlayerEntity) {
-                val player = (PlayerEntity) ctx.getRenderViewEntity();
-                val side = player.getPrimaryHand().opposite();
-                val strength = ctx.getPlayer().getCooledAttackStrength(0);
+                PlayerEntity player = (PlayerEntity) ctx.getRenderViewEntity();
+                HandSide side = player.getPrimaryHand().opposite();
+                double strength = ctx.getPlayer().getCooledAttackStrength(0);
 
                 if (strength < 1) {
-                    val halfWidth = ctx.getScreenWidth() / 2;
-                    val y = ctx.getScreenHeight() - 20;
-                    val offset = 91 + getAttackIndicatorOffset();
-                    val x = halfWidth + (side == HandSide.RIGHT ? -offset - 22 : offset + 6);
-                    val strPixel = (int) (strength * 19);
+                    int halfWidth = ctx.screenWidth / 2;
+                    int y = ctx.screenHeight - 20;
+                    int offset = 91 + getAttackIndicatorOffset();
+                    int x = halfWidth + (side == HandSide.RIGHT ? -offset - 22 : offset + 6);
+                    int strPixel = (int) (strength * 19);
 
-                    GlStateManager.color(1, 1, 1, 1);
+                    GlStateManager.color4f(1, 1, 1, 1);
                     GlStateManager.enableRescaleNormal();
                     GlStateManager.enableBlend();
-                    GlStateManager.tryBlendFuncSeparate(
+                    GlStateManager.blendFuncSeparate(
                         SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA,
                         SourceFactor.ONE, DestFactor.ZERO
                     );
 
                     RenderHelper.enableGUIStandardItemLighting();
 
-                    ctx.bindTexture(AbstractGui.ICONS);
+                    ctx.bindTexture(AbstractGui.GUI_ICONS_LOCATION);
                     ctx.drawTexturedModalRect(x, y, 0, 94, 18, 18);
                     ctx.drawTexturedModalRect(x, y + 18 - strPixel, 18, 112 - strPixel, 18, strPixel);
 
@@ -134,16 +132,16 @@ public final class HotbarRender implements IRenderEvent {
                     GlStateManager.disableBlend();
                 }
             }
-            ctx.getGameSettings().attackIndicator = 2;
+            ctx.getGameSettings().attackIndicator = AttackIndicatorStatus.CROSSHAIR;
         }
     }
 
     private int getAttackIndicatorOffset() {
-        val cachedItems = InventoryCache.getInventory();
-        val slot = 20, padding = 9;
+        List<CachedItem> cachedItems = InventoryCache.getInventory();
+        int slot = 20, padding = 9;
 
         if (cachedItems.size() > 0) {
-            val slots = cachedItems.size() < HOTBAR_HUD.slotLimit
+            int slots = cachedItems.size() < HOTBAR_HUD.slotLimit
                         ? cachedItems.size()
                         : HOTBAR_HUD.slotLimit;
             return (slot * slots) + padding;
@@ -153,18 +151,18 @@ public final class HotbarRender implements IRenderEvent {
     }
 
     private void renderHotbarBackground(
-        @NonNull final RenderContext ctx,
+        final RenderContext ctx,
         final int x,
         final int y,
         final int slots
     ) {
-        val textureY = HOTBAR_HUD.hudStyle.getTextureY();
+        int textureY = HOTBAR_HUD.hudStyle.textureY;
 
         ctx.bindTexture(HotbarRender.HUD_ELEMENTS);
         ctx.drawTexturedModalRect(x, y, 0, textureY, 11, 22);
 
-        for (var i = 0; i < ((slots - 1) * 2); ++i) {
-            val textureX = i % 2 == 0 ? 32 : 22;
+        for (int i = 0; i < ((slots - 1) * 2); ++i) {
+            int textureX = i % 2 == 0 ? 32 : 22;
             ctx.drawTexturedModalRect(x + (11 + (10 * i)), y, textureX, textureY, 10, 22);
         }
 

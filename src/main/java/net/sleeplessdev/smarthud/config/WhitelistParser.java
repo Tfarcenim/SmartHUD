@@ -12,6 +12,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -25,6 +26,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -114,16 +116,16 @@ public final class WhitelistParser {
                 JsonArray array = json.get("dimensions").getAsJsonArray();
 
                 if (array.size() == 1) {
-                    int dim = array.get(0).getAsInt();
+                    DimensionType dim = DimensionType.getById(array.get(0).getAsInt());
 
                     if (isDimensionPresent(dim, i)) {
                         cachedItem.setDimensionPredicate(d -> d == dim);
                     } else cachedItem.setDimensionPredicate(d -> false);
                 } else {
-                    Set<Integer> dims = new IntOpenHashSet();
+                    Set<DimensionType> dims = new HashSet<>();
 
                     for (JsonElement element : array) {
-                        int dim = element.getAsInt();
+                        DimensionType dim = DimensionType.getById(element.getAsInt());
 
                         if (isDimensionPresent(dim, i)) {
                             dims.add(dim);
@@ -149,8 +151,8 @@ public final class WhitelistParser {
         }
     }
 
-    private static boolean isDimensionPresent(final int dim, final int index) {
-        if (DimensionManager.isDimensionRegistered(dim)) return true;
+    private static boolean isDimensionPresent(final DimensionType dim, final int index) {
+        if (/*DimensionManager.isDimensionRegistered(dim)*/true) return true;//todo
         SmartHUD.LOGGER.warn("Unregistered or invalid dimension {} found in whitelist entry at index {}", dim, index);
         return false;
     }
