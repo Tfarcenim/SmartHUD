@@ -9,18 +9,18 @@ import lombok.experimental.UtilityClass;
 import lombok.experimental.var;
 import lombok.val;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.particle.ItemPickupParticle;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleItemPickup;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.api.distmarker.Dist;
 import net.sleeplessdev.smarthud.SmartHUD;
 import net.sleeplessdev.smarthud.util.CachedItem;
 
@@ -32,7 +32,7 @@ import java.util.Queue;
 import static net.sleeplessdev.smarthud.config.ModulesConfig.ITEM_PICKUP_HUD;
 
 @UtilityClass
-@EventBusSubscriber(modid = SmartHUD.ID, value = Side.CLIENT)
+@EventBusSubscriber(modid = SmartHUD.ID, value = Dist.CLIENT)
 public class ItemPickupQueue {
     @Getter private EvictingQueue<CachedItem> items =
         EvictingQueue.create(ITEM_PICKUP_HUD.itemLimit);
@@ -83,7 +83,7 @@ public class ItemPickupQueue {
         @NonNull final MethodHandles.Lookup lookup,
         @NonNull final String... fieldNames
     ) throws IllegalAccessException {
-        return lookup.unreflectGetter(ReflectionHelper.findField(ParticleItemPickup.class, fieldNames));
+        return lookup.unreflectGetter(ReflectionHelper.findField(ItemPickupParticle.class, fieldNames));
     }
 
     private Queue<Particle> createForwardingParticleQueue(
@@ -100,7 +100,7 @@ public class ItemPickupQueue {
             @Override
             public boolean add(@Nullable final Particle particle) {
                 if (!super.add(particle)) return false;
-                if (particle != null && ParticleItemPickup.class.equals(particle.getClass())) {
+                if (particle != null && ItemPickupParticle.class.equals(particle.getClass())) {
                     @NonNull final Entity item;
                     @NonNull final Entity target;
                     try {
@@ -110,8 +110,8 @@ public class ItemPickupQueue {
                         Throwables.throwIfUnchecked(e);
                         throw new RuntimeException(e);
                     }
-                    if (item instanceof EntityItem && target instanceof EntityPlayerSP) {
-                        handleItemCollection(((EntityItem) item).getItem());
+                    if (item instanceof ItemEntity && target instanceof ClientPlayerEntity) {
+                        handleItemCollection(((ItemEntity) item).getItem());
                     }
                 }
                 return true;

@@ -8,23 +8,20 @@ import net.minecraftforge.common.config.Config.Name;
 import net.minecraftforge.common.config.Config.RangeInt;
 import net.minecraftforge.common.config.Config.Type;
 import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.api.distmarker.Dist;
 import net.sleeplessdev.smarthud.SmartHUD;
 import net.sleeplessdev.smarthud.data.HotbarStyle;
 import net.sleeplessdev.smarthud.data.PickupStyle;
 
-@UtilityClass
-@Config(modid = SmartHUD.ID, name = SmartHUD.ID + "/modules", category = "")
-@EventBusSubscriber(modid = SmartHUD.ID, value = Side.CLIENT)
+@EventBusSubscriber(modid = SmartHUD.ID, value = Dist.CLIENT)
 public class ModulesConfig {
-    @Name("hotbar")
-    public final Hotbar HOTBAR_HUD = new Hotbar();
 
-    @Name("item_pickup")
-    public final ItemPickup ITEM_PICKUP_HUD = new ItemPickup();
+    public static final Hotbar HOTBAR_HUD = new Hotbar();
+
+    public static final ItemPickup ITEM_PICKUP_HUD = new ItemPickup();
 
     @SubscribeEvent
     void onConfigChanged(@NonNull final OnConfigChangedEvent event) {

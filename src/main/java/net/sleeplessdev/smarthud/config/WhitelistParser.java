@@ -10,16 +10,16 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.experimental.var;
 import lombok.val;
-import net.minecraft.init.Items;
+import net.minecraft.item.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
 import net.sleeplessdev.smarthud.SmartHUD;
 import net.sleeplessdev.smarthud.util.CachedItem;
 
@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @UtilityClass
-@EventBusSubscriber(modid = SmartHUD.ID, value = Side.CLIENT)
+@EventBusSubscriber(modid = SmartHUD.ID, value = Dist.CLIENT)
 public final class WhitelistParser {
     private final List<CachedItem> ITEMS = new ArrayList<>();
 

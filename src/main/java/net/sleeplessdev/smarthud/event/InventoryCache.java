@@ -6,9 +6,9 @@ import lombok.experimental.UtilityClass;
 import lombok.experimental.var;
 import lombok.val;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.api.distmarker.Dist;
 import net.sleeplessdev.smarthud.SmartHUD;
 import net.sleeplessdev.smarthud.compat.BaublesIntegration;
 import net.sleeplessdev.smarthud.util.CachedItem;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @UtilityClass
-@EventBusSubscriber(modid = SmartHUD.ID, value = Side.CLIENT)
+@EventBusSubscriber(modid = SmartHUD.ID, value = Dist.CLIENT)
 public class InventoryCache {
     private List<CachedItem> inventory = new ArrayList<>();
 

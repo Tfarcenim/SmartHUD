@@ -4,16 +4,16 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.val;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.relauncher.Side;
 import net.sleeplessdev.smarthud.SmartHUD;
 
 @UtilityClass
-@EventBusSubscriber(modid = SmartHUD.ID, value = Side.CLIENT)
+@EventBusSubscriber(modid = SmartHUD.ID, value = Dist.CLIENT)
 public class TickListener {
     @Getter
     private static long ticksElapsed;

@@ -1,15 +1,15 @@
 package net.sleeplessdev.smarthud.render;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import lombok.NonNull;
 import lombok.experimental.var;
 import lombok.val;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.GlStateManager.DestFactor;
-import net.minecraft.client.renderer.GlStateManager.SourceFactor;
+import net.minecraft.client.gui.AbstractGui;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumHandSide;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.HandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.sleeplessdev.smarthud.SmartHUD;
@@ -102,8 +102,8 @@ public final class HotbarRender implements IRenderEvent {
     @Override
     public void onRenderTickPost(@NonNull final RenderContext ctx) {
         if (ctx.getGameSettings().attackIndicator == Integer.MIN_VALUE) {
-            if (ctx.getRenderViewEntity() instanceof EntityPlayer) {
-                val player = (EntityPlayer) ctx.getRenderViewEntity();
+            if (ctx.getRenderViewEntity() instanceof PlayerEntity) {
+                val player = (PlayerEntity) ctx.getRenderViewEntity();
                 val side = player.getPrimaryHand().opposite();
                 val strength = ctx.getPlayer().getCooledAttackStrength(0);
 
@@ -111,7 +111,7 @@ public final class HotbarRender implements IRenderEvent {
                     val halfWidth = ctx.getScreenWidth() / 2;
                     val y = ctx.getScreenHeight() - 20;
                     val offset = 91 + getAttackIndicatorOffset();
-                    val x = halfWidth + (side == EnumHandSide.RIGHT ? -offset - 22 : offset + 6);
+                    val x = halfWidth + (side == HandSide.RIGHT ? -offset - 22 : offset + 6);
                     val strPixel = (int) (strength * 19);
 
                     GlStateManager.color(1, 1, 1, 1);
@@ -124,7 +124,7 @@ public final class HotbarRender implements IRenderEvent {
 
                     RenderHelper.enableGUIStandardItemLighting();
 
-                    ctx.bindTexture(Gui.ICONS);
+                    ctx.bindTexture(AbstractGui.ICONS);
                     ctx.drawTexturedModalRect(x, y, 0, 94, 18, 18);
                     ctx.drawTexturedModalRect(x, y + 18 - strPixel, 18, 112 - strPixel, 18, strPixel);
 

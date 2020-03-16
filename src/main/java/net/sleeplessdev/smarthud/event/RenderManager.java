@@ -5,10 +5,10 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.api.distmarker.Dist;
 import net.sleeplessdev.smarthud.SmartHUD;
 import net.sleeplessdev.smarthud.render.HotbarRender;
 import net.sleeplessdev.smarthud.render.ItemPickupRender;
@@ -18,7 +18,7 @@ import net.sleeplessdev.smarthud.util.RenderContext;
 import java.util.List;
 
 @UtilityClass
-@Mod.EventBusSubscriber(modid = SmartHUD.ID, value = Side.CLIENT)
+@Mod.EventBusSubscriber(modid = SmartHUD.ID, value = Dist.CLIENT)
 public class RenderManager {
     private final List<IRenderEvent> EVENTS = Lists.newArrayList(new HotbarRender(), new ItemPickupRender());
 

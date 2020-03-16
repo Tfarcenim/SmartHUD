@@ -3,20 +3,20 @@ package net.sleeplessdev.smarthud.util;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.EnumHandSide;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.HandSide;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 @UtilityClass
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class HandHelper {
     @NonNull
-    public EnumHandSide getMainHand() {
+    public HandSide getMainHand() {
         return Minecraft.getMinecraft().gameSettings.mainHand;
     }
 
     public boolean isLeftHanded() {
-        return getMainHand() == EnumHandSide.LEFT;
+        return getMainHand() == HandSide.LEFT;
     }
 
     /**
