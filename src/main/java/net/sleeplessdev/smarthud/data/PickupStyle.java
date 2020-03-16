@@ -1,17 +1,15 @@
 package net.sleeplessdev.smarthud.data;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
-
-@Getter
-@Accessors(fluent = true)
-@RequiredArgsConstructor
 public enum PickupStyle {
     BOTH(true, true),
     ICON_ONLY(true, false),
     NAME_ONLY(false, true);
 
-    private final boolean hasIcon;
-    private final boolean hasLabel;
+    public final boolean hasIcon;
+    public final boolean hasLabel;
+
+    PickupStyle(boolean hasIcon, boolean hasLabel) {
+        this.hasIcon = hasIcon;
+        this.hasLabel = hasLabel;
+    }
 }

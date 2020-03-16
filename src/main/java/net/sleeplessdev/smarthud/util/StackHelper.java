@@ -1,32 +1,22 @@
 package net.sleeplessdev.smarthud.util;
 
-import lombok.NonNull;
-import lombok.experimental.UtilityClass;
-import lombok.experimental.var;
-import lombok.val;
 import net.minecraft.item.ItemStack;
 import net.sleeplessdev.smarthud.config.WhitelistParser;
 
 import java.util.List;
 
-@UtilityClass
 public class StackHelper {
-    public boolean isWhitelisted(@NonNull final ItemStack stack, final int dimension) {
-        for (val item : WhitelistParser.entries()) {
-            if (item.matchesStack(stack, true) && item.matchesDimension(dimension)) {
-                return true;
-            }
-        }
-        return false;
+    public boolean isWhitelisted(final ItemStack stack, final int dimension) {
+        return WhitelistParser.entries().stream().anyMatch(item -> item.matchesStack(stack, true) && item.matchesDimension(dimension));
     }
 
-    public void process(@NonNull final List<CachedItem> cache, @NonNull final ItemStack stack) {
-        val count = stack.getCount();
-        var shouldCache = true;
+    public void process(final List<CachedItem> cache, final ItemStack stack) {
+        int count = stack.getCount();
+        boolean shouldCache = true;
 
-        for (val item : cache) {
+        for (CachedItem item : cache) {
             if (item.matchesStack(stack, false) && item.isMergeDuplicates()) {
-                item.setCount(item.getCount() + count);
+                item.count += count;
                 shouldCache = false;
                 break;
             }

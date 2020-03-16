@@ -3,11 +3,6 @@ package net.sleeplessdev.smarthud.event;
 import com.google.common.base.Throwables;
 import com.google.common.collect.EvictingQueue;
 import com.google.common.collect.ForwardingQueue;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.experimental.UtilityClass;
-import lombok.experimental.var;
-import lombok.val;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.particle.ItemPickupParticle;
@@ -19,8 +14,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.sleeplessdev.smarthud.SmartHUD;
 import net.sleeplessdev.smarthud.util.CachedItem;
 
@@ -31,15 +26,14 @@ import java.util.Queue;
 
 import static net.sleeplessdev.smarthud.config.ModulesConfig.ITEM_PICKUP_HUD;
 
-@UtilityClass
 @EventBusSubscriber(modid = SmartHUD.ID, value = Dist.CLIENT)
 public class ItemPickupQueue {
-    @Getter private EvictingQueue<CachedItem> items =
+    public EvictingQueue<CachedItem> items =
         EvictingQueue.create(ITEM_PICKUP_HUD.itemLimit);
 
-    private boolean init = false;
+    private static boolean init = false;
 
-    public void initialize() {
+    public static void initialize() {
         if (!init) {
             initializeParticleQueue();
             init = true;
@@ -65,7 +59,7 @@ public class ItemPickupQueue {
         }
     }
 
-    private void initializeParticleQueue() {
+    private static void initializeParticleQueue() {
         try {
             val field = ReflectionHelper.findField(ParticleManager.class, "field_187241_h", "queue");
             val lookup = MethodHandles.lookup();
@@ -79,17 +73,15 @@ public class ItemPickupQueue {
         }
     }
 
-    private MethodHandle getParticleItemPickupGetter(
-        @NonNull final MethodHandles.Lookup lookup,
-        @NonNull final String... fieldNames
+    private MethodHandle getParticleItemPickupGetter(final MethodHandles.Lookup lookup, final String fieldName
     ) throws IllegalAccessException {
-        return lookup.unreflectGetter(ReflectionHelper.findField(ItemPickupParticle.class, fieldNames));
+        return lookup.unreflectGetter(ObfuscationReflectionHelper.findField(ItemPickupParticle.class, fieldName));
     }
 
     private Queue<Particle> createForwardingParticleQueue(
-        @NonNull final Queue<Particle> delegate,
-        @NonNull final MethodHandle itemGetter,
-        @NonNull final MethodHandle targetGetter
+            final Queue<Particle> delegate,
+        final MethodHandle itemGetter,
+        final MethodHandle targetGetter
     ) {
         return new ForwardingQueue<Particle>() {
             @Override

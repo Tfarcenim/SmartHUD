@@ -1,19 +1,13 @@
 package net.sleeplessdev.smarthud.util;
 
-import lombok.Getter;
-import lombok.NonNull;
+import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.api.distmarker.Dist;
 
-@Getter
-@OnlyIn(Dist.CLIENT)
 public final class RenderContext {
     private final Minecraft client;
     private final int screenWidth;
