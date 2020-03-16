@@ -8,7 +8,7 @@ import net.sleeplessdev.smarthud.SmartHUD;
 import net.sleeplessdev.smarthud.data.HotbarStyle;
 import net.sleeplessdev.smarthud.data.PickupStyle;
 
-@EventBusSubscriber(modid = SmartHUD.ID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = SmartHUD.ID, value = Dist.CLIENT,bus = EventBusSubscriber.Bus.MOD)
 public class ModulesConfig {
 
     public static final Hotbar HOTBAR_HUD = new Hotbar();
@@ -16,7 +16,7 @@ public class ModulesConfig {
     public static final ItemPickup ITEM_PICKUP_HUD = new ItemPickup();
 
     @SubscribeEvent
-    void onConfigChanged(final OnConfigChangedEvent event) {
+    public static void onConfigChanged(final OnConfigChangedEvent event) {
         if (SmartHUD.ID.equals(event.getModID())) {
          //   ConfigManager.sync(SmartHUD.ID, Type.INSTANCE);
         }

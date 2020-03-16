@@ -13,7 +13,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.sleeplessdev.smarthud.SmartHUD;
 import net.sleeplessdev.smarthud.data.HotbarStyle;
-import net.sleeplessdev.smarthud.event.InventoryCache;
 import net.sleeplessdev.smarthud.util.*;
 
 import java.util.List;
@@ -35,7 +34,7 @@ public final class HotbarRender implements RenderEvent {
 
     @Override
     public void onRenderTickPre(final RenderContext ctx) {
-        List<CachedItem> cachedItems = InventoryCache.getInventory();
+        List<CachedItem> cachedItems = SmartHUD.inventory;
         int slots = cachedItems.size() >= HOTBAR_HUD.slotLimit
                     ? HOTBAR_HUD.slotLimit
                     : cachedItems.size();
@@ -137,7 +136,7 @@ public final class HotbarRender implements RenderEvent {
     }
 
     private int getAttackIndicatorOffset() {
-        List<CachedItem> cachedItems = InventoryCache.getInventory();
+        List<CachedItem> cachedItems = SmartHUD.inventory;
         int slot = 20, padding = 9;
 
         if (cachedItems.size() > 0) {

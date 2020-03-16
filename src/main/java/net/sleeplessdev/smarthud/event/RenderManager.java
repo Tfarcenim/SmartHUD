@@ -19,25 +19,27 @@ public class RenderManager {
     private static final List<RenderEvent> EVENTS = Lists.newArrayList(new HotbarRender(), new ItemPickupRender());
 
     @SubscribeEvent
-    void onRenderGameOverlayPre(final RenderGameOverlayEvent.Pre event) {
+    public static void onRenderGameOverlayPre(final RenderGameOverlayEvent.Pre event) {
         RenderContext ctx = new RenderContext(Minecraft.getInstance(), event);
 
         for (RenderEvent renderEvent : RenderManager.EVENTS) {
-            if (canRender(renderEvent, event)) renderEvent.onRenderTickPre(ctx);
+            if (canRender(renderEvent, event))
+                renderEvent.onRenderTickPre(ctx);
         }
     }
 
     @SubscribeEvent
-    void onRenderGameOverlayPost(final RenderGameOverlayEvent.Post event) {
+    public static void onRenderGameOverlayPost(final RenderGameOverlayEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
         RenderContext ctx = new RenderContext(mc, event);
 
         for (RenderEvent renderEvent : RenderManager.EVENTS) {
-            if (canRender(renderEvent, event)) renderEvent.onRenderTickPost(ctx);
+            if (canRender(renderEvent, event))
+                renderEvent.onRenderTickPost(ctx);
         }
     }
 
-    boolean canRender(final RenderEvent renderEvent, final RenderGameOverlayEvent event) {
+    static boolean canRender(final RenderEvent renderEvent, final RenderGameOverlayEvent event) {
         return renderEvent.canRender() && renderEvent.getType() == event.getType();
     }
 }

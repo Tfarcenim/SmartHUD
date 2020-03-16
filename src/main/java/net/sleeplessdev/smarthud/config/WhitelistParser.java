@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-@EventBusSubscriber(modid = SmartHUD.ID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = SmartHUD.ID, value = Dist.CLIENT,bus = EventBusSubscriber.Bus.MOD)
 public final class WhitelistParser {
     private static final List<CachedItem> ITEMS = new ArrayList<>();
 
@@ -40,10 +40,10 @@ public final class WhitelistParser {
     }
 
     @SubscribeEvent
-    void onConfigChanged(OnConfigChangedEvent event) {
-        if (SmartHUD.ID.equals(event.getModID())) {
+    public static void onConfigChanged(OnConfigChangedEvent event) {
+        //if (SmartHUD.ID.equals(event.getModID())) {
             reload();
-        }
+        //}
     }
 
     public static void reload() {

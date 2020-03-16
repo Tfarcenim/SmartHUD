@@ -3,6 +3,7 @@ package net.sleeplessdev.smarthud.util;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.dimension.DimensionType;
+import net.sleeplessdev.smarthud.SmartHUD;
 import net.sleeplessdev.smarthud.config.ModulesConfig;
 
 import java.util.function.Predicate;
@@ -26,7 +27,7 @@ public final class CachedItem {
         this.actualCount = stack.getCount();
         this.stack.setCount(1);
         this.count = count;
-        this.timestamp = TickListener.ticksElapsed;
+        this.timestamp = SmartHUD.ticksElapsed;
         this.dimensionPredicate = i -> true;
     }
 
@@ -48,7 +49,7 @@ public final class CachedItem {
     }
 
     public void renewTimestamp() {
-        timestamp = TickListener.ticksElapsed;
+        timestamp = SmartHUD.ticksElapsed;
     }
 
     public ITextComponent getName() {
@@ -56,7 +57,7 @@ public final class CachedItem {
     }
 
     public long getRemainingTicks(final int cooldown) {
-        long time = TickListener.ticksElapsed;
+        long time = SmartHUD.ticksElapsed;
         return (timestamp + cooldown / 50) - time;
     }
 

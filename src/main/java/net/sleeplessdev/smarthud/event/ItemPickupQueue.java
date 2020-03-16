@@ -27,7 +27,7 @@ import java.util.Queue;
 
 import static net.sleeplessdev.smarthud.config.ModulesConfig.ITEM_PICKUP_HUD;
 
-@EventBusSubscriber(modid = SmartHUD.ID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = SmartHUD.ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public class ItemPickupQueue {
     public static EvictingQueue<CachedItem> items =
         EvictingQueue.create(ITEM_PICKUP_HUD.itemLimit);
@@ -50,11 +50,11 @@ public class ItemPickupQueue {
         EvictingQueue<CachedItem> newQueue = createNewQueue();
         if (newQueue.addAll(ItemPickupQueue.items)) {
             ItemPickupQueue.items = newQueue;
-        } else throw new IllegalStateException("Unable to populate new queue");
+        } //else throw new IllegalStateException("Unable to populate new queue");
     }
 
     @SubscribeEvent
-    void onConfigChanged(final OnConfigChangedEvent event) {
+    public static void onConfigChanged(final OnConfigChangedEvent event) {
         if (SmartHUD.ID.equals(event.getModID())) {
             reloadQueue();
         }
