@@ -6,8 +6,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.minecraftforge.common.MinecraftForge.EVENT_BUS;
+import static net.sleeplessdev.smarthud.config.ModulesConfig.CLIENT_SPEC;
 
 @Mod(SmartHUD.ID)
 public final class SmartHUD {
@@ -34,6 +37,7 @@ public final class SmartHUD {
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onPreInit);
 		EVENT_BUS.addListener(this::onClientTick);
 		EVENT_BUS.addListener(this::onPlayerTick);
+		ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CLIENT_SPEC);
 	}
 
 	public static SmartHUD INSTANCE;
@@ -59,7 +63,7 @@ public final class SmartHUD {
 		PlayerEntity player = event.player;
 		List<ItemStack> inv = player.inventory.mainInventory;
 		List<CachedItem> inventoryCache = new ArrayList<>();
-		DimensionType dim = player.dimension;
+		String dim = player.dimension.getRegistryName().toString();
 
 		for (int slot = 9; slot < 36; ++slot) {
 			ItemStack stack = inv.get(slot).copy();

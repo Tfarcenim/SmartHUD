@@ -20,7 +20,7 @@ public final class CachedItem {
 
     private Boolean mergeDuplicates = null;
 
-    private Predicate<DimensionType> dimensionPredicate;
+    private Predicate<String> dimensionPredicate;
 
     public CachedItem(final ItemStack stack, final int count) {
         this.stack = stack.copy();
@@ -36,7 +36,7 @@ public final class CachedItem {
     }
 
     public boolean isMergeDuplicates() {
-        return mergeDuplicates != null ? mergeDuplicates : ModulesConfig.HOTBAR_HUD.mergeDuplicates;
+        return mergeDuplicates != null ? mergeDuplicates : ModulesConfig.mergeDuplicates.get();
     }
 
     public void setMergeDuplicates(final boolean mergeDuplicates) {
@@ -44,7 +44,7 @@ public final class CachedItem {
     }
 
 
-    public void setDimensionPredicate(final Predicate<DimensionType> predicate) {
+    public void setDimensionPredicate(final Predicate<String> predicate) {
         this.dimensionPredicate = predicate;
     }
 
@@ -61,7 +61,7 @@ public final class CachedItem {
         return (timestamp + cooldown / 50) - time;
     }
 
-    public boolean matchesDimension(final DimensionType dimension) {
+    public boolean matchesDimension(final String dimension) {
         return dimensionPredicate.test(dimension);
     }
 

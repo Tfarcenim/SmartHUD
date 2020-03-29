@@ -6,15 +6,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import net.minecraft.item.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
@@ -47,7 +44,7 @@ public final class WhitelistParser {
     }
 
     public static void reload() {
-        if (!GeneralConfig.WHITELIST.isEnabled) {
+        if (!ModulesConfig.isEnabled.get()) {
             ITEMS.clear();
             ITEMS.add(new CachedItem(new ItemStack(Items.CLOCK)));
             ITEMS.add(new CachedItem(new ItemStack(Items.COMPASS)));
@@ -116,16 +113,16 @@ public final class WhitelistParser {
                 JsonArray array = json.get("dimensions").getAsJsonArray();
 
                 if (array.size() == 1) {
-                    DimensionType dim = DimensionType.getById(array.get(0).getAsInt());
+                    String dim = array.get(0).getAsString();
 
                     if (isDimensionPresent(dim, i)) {
-                        cachedItem.setDimensionPredicate(d -> d == dim);
+                        cachedItem.setDimensionPredicate(d -> d .equals( dim));
                     } else cachedItem.setDimensionPredicate(d -> false);
                 } else {
-                    Set<DimensionType> dims = new HashSet<>();
+                    Set<String> dims = new HashSet<>();
 
                     for (JsonElement element : array) {
-                        DimensionType dim = DimensionType.getById(element.getAsInt());
+                        String dim = element.getAsString();
 
                         if (isDimensionPresent(dim, i)) {
                             dims.add(dim);
@@ -143,7 +140,7 @@ public final class WhitelistParser {
         long time = stopwatch.stop().elapsed(TimeUnit.MILLISECONDS);
         SmartHUD.LOGGER.info("Finished processing whitelist config in {}ms", time);
 
-        if (!missingEntries.isEmpty() && GeneralConfig.WHITELIST.logMissingEntries) {
+        if (!missingEntries.isEmpty() && ModulesConfig.logMissingEntries.get()) {
             SmartHUD.LOGGER.warn("Entries were skipped as the following items could not be found:");
             for (String entry : missingEntries) {
                 SmartHUD.LOGGER.warn("-> " + entry);
@@ -151,8 +148,13 @@ public final class WhitelistParser {
         }
     }
 
-    private static boolean isDimensionPresent(final DimensionType dim, final int index) {
-        if (/*DimensionManager.isDimensionRegistered(dim)*/true) return true;//todo
+    public static boolean isDimensionRegistered(final String dim) {
+        ResourceLocation id = new ResourceLocation(dim);
+        return Registry.DIMENSION_TYPE.getValue(id).isPresent();
+    }
+
+    private static boolean isDimensionPresent(final String dim, final int index) {
+        if (isDimensionRegistered(dim)) return true;
         SmartHUD.LOGGER.warn("Unregistered or invalid dimension {} found in whitelist entry at index {}", dim, index);
         return false;
     }

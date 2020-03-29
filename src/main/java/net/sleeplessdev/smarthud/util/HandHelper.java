@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.HandSide;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.sleeplessdev.smarthud.config.ModulesConfig;
 
 @OnlyIn(Dist.CLIENT)
 public class HandHelper {
@@ -24,8 +25,9 @@ public class HandHelper {
      * @param objectWidth   The current width of the element, used when inverting the position to the negative
      * @return The new offset depending on the current game setting
      */
-    public static float getSideOffset(final float currentOffset, final float objectWidth) {
+    public static float getSideOffset(float currentOffset, final float objectWidth) {
         float offset = currentOffset;
+        currentOffset += ModulesConfig.xOffset.get();
         float newOffset = 0.0F;
 
         if (isLeftHanded()) {

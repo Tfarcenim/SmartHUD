@@ -12,19 +12,19 @@ import net.minecraft.util.HandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.sleeplessdev.smarthud.SmartHUD;
+import net.sleeplessdev.smarthud.config.ModulesConfig;
 import net.sleeplessdev.smarthud.data.HotbarStyle;
 import net.sleeplessdev.smarthud.util.*;
 
 import java.util.List;
 
-import static net.sleeplessdev.smarthud.config.ModulesConfig.HOTBAR_HUD;
 
 public final class HotbarRender implements RenderEvent {
     private static final ResourceLocation HUD_ELEMENTS = new ResourceLocation(SmartHUD.ID, "textures/hud/elements.png");
 
     @Override
     public boolean canRender() {
-        return HOTBAR_HUD.isEnabled;
+        return ModulesConfig.enableHotbar.get();
     }
 
     @Override
@@ -35,15 +35,15 @@ public final class HotbarRender implements RenderEvent {
     @Override
     public void onRenderTickPre(final RenderContext ctx) {
         List<CachedItem> cachedItems = SmartHUD.inventory;
-        int slots = cachedItems.size() >= HOTBAR_HUD.slotLimit
-                    ? HOTBAR_HUD.slotLimit
+        int slots = cachedItems.size() >= ModulesConfig.slotLimit.get()
+                    ? ModulesConfig.slotLimit.get()
                     : cachedItems.size();
         int center = ctx.screenWidth / 2;
         int baseOffset = 98;
 
         if (cachedItems.size() > 0) {
-            if (HOTBAR_HUD.hudStyle != HotbarStyle.INVISIBLE) {
-                int width = 44 + (20 * (cachedItems.size() - 2)) - 2;
+            if (ModulesConfig.hotbarStyle != HotbarStyle.INVISIBLE) {
+                int width =  20 * cachedItems.size() + 6;
                 int offset = (int) HandHelper.getSideOffset(baseOffset, width);
 
                 renderHotbarBackground(ctx, center + offset, ctx.screenHeight - 22, slots);
@@ -56,8 +56,8 @@ public final class HotbarRender implements RenderEvent {
                 int stackX = center + (int) HandHelper.getSideOffset(stackOffset, 16.0F);
                 int stackY = ctx.screenHeight - 19;
 
-                boolean renderOverlay = !stack.isStackable() && HOTBAR_HUD.renderOverlays;
-                boolean showStackSize = cachedItem.count > 1 && HOTBAR_HUD.showStackSize;
+                boolean renderOverlay = !stack.isStackable() && ModulesConfig.renderOverlays.get();
+                boolean showStackSize = cachedItem.count > 1 && ModulesConfig.showStackSize.get();
 
                 RenderHelper.enableGUIStandardItemLighting();
                 ctx.renderItem(stack, stackX, stackY, true);
@@ -85,7 +85,7 @@ public final class HotbarRender implements RenderEvent {
                     ctx.drawStringWithShadow(StringHelper.getAbbreviatedValue(count), labelX, labelY);
                 }
             }
-        } else if (HOTBAR_HUD.alwaysShow && HOTBAR_HUD.hudStyle != HotbarStyle.INVISIBLE) {
+        } else if (ModulesConfig.alwaysShow.get() && ModulesConfig.hotbarStyle != HotbarStyle.INVISIBLE) {
             int offset = (int) HandHelper.getSideOffset(baseOffset, 20.0F);
 
             renderHotbarBackground(ctx, center + offset, ctx.screenHeight - 22, 1);
@@ -140,11 +140,11 @@ public final class HotbarRender implements RenderEvent {
         int slot = 20, padding = 9;
 
         if (cachedItems.size() > 0) {
-            int slots = cachedItems.size() < HOTBAR_HUD.slotLimit
+            int slots = cachedItems.size() < ModulesConfig.slotLimit.get()
                         ? cachedItems.size()
-                        : HOTBAR_HUD.slotLimit;
+                        : ModulesConfig.slotLimit.get();
             return (slot * slots) + padding;
-        } else if (HOTBAR_HUD.alwaysShow) {
+        } else if (ModulesConfig.alwaysShow.get()) {
             return slot + padding;
         } else return 0;
     }
@@ -155,7 +155,7 @@ public final class HotbarRender implements RenderEvent {
         final int y,
         final int slots
     ) {
-        int textureY = HOTBAR_HUD.hudStyle.textureY;
+        int textureY = ModulesConfig.hotbarStyle.textureY;
 
         ctx.bindTexture(HotbarRender.HUD_ELEMENTS);
         ctx.drawTexturedModalRect(x, y, 0, textureY, 11, 22);

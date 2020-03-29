@@ -1,13 +1,12 @@
 package net.sleeplessdev.smarthud.util;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.dimension.DimensionType;
 import net.sleeplessdev.smarthud.config.WhitelistParser;
 
 import java.util.List;
 
 public class StackHelper {
-    public static boolean isWhitelisted(final ItemStack stack, final DimensionType dimension) {
+    public static boolean isWhitelisted(final ItemStack stack, final String dimension) {
         return WhitelistParser.entries().stream().anyMatch(item -> item.matchesStack(stack, true) && item.matchesDimension(dimension));
     }
 

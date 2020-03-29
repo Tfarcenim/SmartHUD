@@ -24,7 +24,7 @@ public final class ItemPickupRender implements RenderEvent {
 
     @Override
     public boolean canRender() {
-        return ModulesConfig.ITEM_PICKUP_HUD.isEnabled;
+        return ModulesConfig.itemPickupEnabled.get();
     }
 
     @Override
@@ -36,7 +36,7 @@ public final class ItemPickupRender implements RenderEvent {
     public void onRenderTickPre(final RenderContext ctx) {
         EvictingQueue<CachedItem> items = ItemPickupQueue.items;
         if (!items.isEmpty()) {
-            int x = ModulesConfig.ITEM_PICKUP_HUD.hudStyle.hasIcon ? 17 : 4;
+            int x = ModulesConfig.itemPickupStyle.hasIcon ? 17 : 4;
             int y = ctx.screenHeight - (ctx.getFontHeight() * items.size()) - (2 * items.size());
             Iterator<CachedItem> iterator = items.iterator();
 
@@ -57,22 +57,22 @@ public final class ItemPickupRender implements RenderEvent {
         final float renderY,
         final CachedItem item
     ) {
-        boolean name = ModulesConfig.ITEM_PICKUP_HUD.hudStyle.hasLabel;
+        boolean name = ModulesConfig.itemPickupStyle.hasLabel;
         String key = "label." + SmartHUD.ID + ".pickup." + (name ? "long" : "short");
         String count = StringHelper.getAbbreviatedValue(item.count);
-        String label = I18n.format(key, count, item.getName());
+        String label = I18n.format(key, count, item.getName().getFormattedText());
 
         int color = 0xFFFFFF;
         int labelWidth = ctx.getStringWidth(label);
         float labelX = HandHelper.getSideOffset(renderX, labelWidth);
-        float iconX = HandHelper.getSideOffset(renderX - 14.0F, 10.72F);
+        float iconY = HandHelper.getSideOffset(renderX - 14.0F, 10.72F);
 
         if (HandHelper.isLeftHanded()) {
             labelX += ctx.screenWidth;
-            iconX += ctx.screenHeight;
+            iconY += ctx.screenHeight;
         }
 
-        float remaining = item.getRemainingTicks(ModulesConfig.ITEM_PICKUP_HUD.displayTime);
+        float remaining = item.getRemainingTicks(ModulesConfig.displayTime.get());
 
         if (remaining < 0) {
             float time = Math.abs(remaining) + ctx.partialTicks;
@@ -87,24 +87,23 @@ public final class ItemPickupRender implements RenderEvent {
             float interpolation = ItemPickupRender.ANIMATION
                 .interpolate(0, ItemPickupRender.ANIMATION_DURATION, time) * end;
             labelX += HandHelper.isLeftHanded() ? interpolation : -interpolation;
-            iconX += HandHelper.isLeftHanded() ? interpolation : -interpolation;
+            iconY += HandHelper.isLeftHanded() ? interpolation : -interpolation;
             //                    break;
             //            }
         }
 
         ctx.drawStringWithShadow(label, labelX, renderY, color);
 
-        if (ModulesConfig.ITEM_PICKUP_HUD.hudStyle.hasIcon) {
+        if (ModulesConfig.itemPickupStyle.hasIcon) {
             GlStateManager.enableBlend();
             RenderHelper.enableGUIStandardItemLighting();
             GlStateManager.pushMatrix();
-            GlStateManager.translated(iconX, renderY - 1.5D, 0.0D);
+            GlStateManager.translated(iconY, renderY - 1.5D, 0.0D);
             GlStateManager.scaled(0.67D, 0.67D, 0.67D);
             ctx.renderItem(item.stack, 0, 0, true); // TODO: Support AnimationStyle#FADE
             GlStateManager.popMatrix();
             RenderHelper.disableStandardItemLighting();
         }
-
         return false;
     }
 }

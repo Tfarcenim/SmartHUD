@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.sleeplessdev.smarthud.SmartHUD;
+import net.sleeplessdev.smarthud.config.ModulesConfig;
 import net.sleeplessdev.smarthud.util.CachedItem;
 
 import javax.annotation.Nullable;
@@ -25,12 +26,10 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.Queue;
 
-import static net.sleeplessdev.smarthud.config.ModulesConfig.ITEM_PICKUP_HUD;
-
 @EventBusSubscriber(modid = SmartHUD.ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public class ItemPickupQueue {
     public static EvictingQueue<CachedItem> items =
-        EvictingQueue.create(ITEM_PICKUP_HUD.itemLimit);
+        EvictingQueue.create(10);
 
     private static boolean init = false;
 
@@ -43,7 +42,7 @@ public class ItemPickupQueue {
     }
 
     private static EvictingQueue<CachedItem> createNewQueue() {
-        return EvictingQueue.create(ITEM_PICKUP_HUD.itemLimit);
+        return EvictingQueue.create(ModulesConfig.slotLimit.get());
     }
 
     private static void reloadQueue() {
@@ -123,11 +122,11 @@ public class ItemPickupQueue {
             for (CachedItem cachedItem : ItemPickupQueue.items) {
                 if (cachedItem.matchesStack(stack, true)) {
                     int count = cachedItem.count + stack.getCount();
-                    if (ITEM_PICKUP_HUD.priorityMode == 0) {
+                    if (ModulesConfig.priorityMode.get() == 0) {
                         newItems.remove(cachedItem);
                         newItems.add(new CachedItem(stack, count));
                         shouldCache = false;
-                    } else if (ITEM_PICKUP_HUD.priorityMode == 1) {
+                    } else if (ModulesConfig.priorityMode.get() == 1) {
                         cachedItem.count = count;
                         cachedItem.renewTimestamp();
                         shouldCache = false;
