@@ -96,7 +96,7 @@ public final class ItemPickupRender implements RenderEvent {
 
         if (ModulesConfig.itemPickupStyle.hasIcon) {
             GlStateManager.enableBlend();
-            RenderHelper.enableGUIStandardItemLighting();
+            RenderHelper.enableStandardItemLighting();
             GlStateManager.pushMatrix();
             GlStateManager.translated(iconY, renderY - 1.5D, 0.0D);
             GlStateManager.scaled(0.67D, 0.67D, 0.67D);

@@ -1,7 +1,7 @@
 package net.sleeplessdev.smarthud.util.interpolation;
 
 
-import javax.vecmath.Vector2f;
+import net.minecraft.util.math.Vec2f;
 
 /**
  * Derived from: https://github.com/codesoup/android-cubic-bezier-interpolator
@@ -11,16 +11,16 @@ import javax.vecmath.Vector2f;
  */
 
 public final class CubicBezierInterpolator implements Interpolator {
-    private final Vector2f start;
-    private final Vector2f end;
+    private final Vec2f start;
+    private final Vec2f end;
 
     // Calculation storage to avoid unnecessary instantiation
-    private final Vector2f a = new Vector2f();
-    private final Vector2f b = new Vector2f();
-    private final Vector2f c = new Vector2f();
+    private Vec2f a = new Vec2f(0,0);
+    private Vec2f b = new Vec2f(0,0);
+    private Vec2f c = new Vec2f(0,0);
 
     public CubicBezierInterpolator(
-        final Vector2f start, final Vector2f end
+        final Vec2f start, final Vec2f end
     ) throws IllegalArgumentException {
         if (start.x < 0 || start.x > 1) {
             throw new IllegalArgumentException("start X value must be in the range [0, 1]");
@@ -35,7 +35,7 @@ public final class CubicBezierInterpolator implements Interpolator {
     }
 
     public CubicBezierInterpolator(final float startX, final float startY, final float endX, final float endY) {
-        this(new Vector2f(startX, startY), new Vector2f(endX, endY));
+        this(new Vec2f(startX, startY), new Vec2f(endX, endY));
     }
 
     public CubicBezierInterpolator(final double startX, final double startY, final double endX, final double endY) {
@@ -48,9 +48,9 @@ public final class CubicBezierInterpolator implements Interpolator {
     }
 
     protected float getBezierCoordinateY(final float time) {
-        c.y = 3 * start.y;
-        b.y = 3 * (end.y - start.y) - c.y;
-        a.y = 1 - c.y - b.y;
+        c = new Vec2f(c.x,3 * start.y);
+        b = new Vec2f(b.x,3 * (end.y - start.y) - c.y);
+        a = new Vec2f(a.x,1 - c.y - b.y);
 
         return time * (c.y + time * (b.y + time * a.y));
     }
@@ -75,9 +75,9 @@ public final class CubicBezierInterpolator implements Interpolator {
     }
 
     private float getBezierCoordinateX(final float time) {
-        c.x = 3 * start.x;
-        b.x = 3 * (end.x - start.x) - c.x;
-        a.x = 1 - c.x - b.x;
+        c = new Vec2f(3 * start.x,c.y);
+        b = new Vec2f(3 * (end.x - start.x) - c.x,b.y);
+        a = new Vec2f(1 - c.x - b.x,a.y);
 
         return time * (c.x + time * (b.x + time * a.x));
     }

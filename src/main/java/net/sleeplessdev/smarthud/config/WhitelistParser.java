@@ -14,8 +14,8 @@ import net.minecraft.util.registry.Registry;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.config.ModConfig;
 import net.sleeplessdev.smarthud.SmartHUD;
 import net.sleeplessdev.smarthud.util.CachedItem;
 
@@ -37,10 +37,10 @@ public final class WhitelistParser {
     }
 
     @SubscribeEvent
-    public static void onConfigChanged(OnConfigChangedEvent event) {
-        //if (SmartHUD.ID.equals(event.getModID())) {
+    public static void onConfigChanged(ModConfig.ModConfigEvent event) {
+        if (SmartHUD.ID.equals(event.getConfig().getModId())) {
             reload();
-        //}
+        }
     }
 
     public static void reload() {

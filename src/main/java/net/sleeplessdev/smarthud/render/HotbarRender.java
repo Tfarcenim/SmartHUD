@@ -1,6 +1,7 @@
 package net.sleeplessdev.smarthud.render;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.AbstractGui;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
@@ -59,7 +60,7 @@ public final class HotbarRender implements RenderEvent {
                 boolean renderOverlay = !stack.isStackable() && ModulesConfig.renderOverlays.get();
                 boolean showStackSize = cachedItem.count > 1 && ModulesConfig.showStackSize.get();
 
-                RenderHelper.enableGUIStandardItemLighting();
+                RenderHelper.enableStandardItemLighting();
                 ctx.renderItem(stack, stackX, stackY, true);
 
                 if (renderOverlay) {
@@ -114,12 +115,12 @@ public final class HotbarRender implements RenderEvent {
                     GlStateManager.color4f(1, 1, 1, 1);
                     GlStateManager.enableRescaleNormal();
                     GlStateManager.enableBlend();
-                    GlStateManager.blendFuncSeparate(
+                    RenderSystem.blendFuncSeparate(
                         SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA,
                         SourceFactor.ONE, DestFactor.ZERO
                     );
 
-                    RenderHelper.enableGUIStandardItemLighting();
+                    RenderHelper.enableStandardItemLighting();
 
                     ctx.bindTexture(AbstractGui.GUI_ICONS_LOCATION);
                     ctx.drawTexturedModalRect(x, y, 0, 94, 18, 18);

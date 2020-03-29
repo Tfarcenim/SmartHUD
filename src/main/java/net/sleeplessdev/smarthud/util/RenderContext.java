@@ -16,8 +16,8 @@ public final class RenderContext {
 
     public RenderContext(final Minecraft mc, final RenderGameOverlayEvent event) {
         client = mc;
-        screenWidth = mc.mainWindow.getScaledWidth();
-        screenHeight = mc.mainWindow.getScaledHeight();
+        screenWidth = mc.getMainWindow().getScaledWidth();
+        screenHeight = mc.getMainWindow().getScaledHeight();
         partialTicks = event.getPartialTicks();
     }
 

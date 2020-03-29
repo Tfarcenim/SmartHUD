@@ -12,10 +12,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.config.ModConfig;
 import net.sleeplessdev.smarthud.SmartHUD;
 import net.sleeplessdev.smarthud.config.ModulesConfig;
 import net.sleeplessdev.smarthud.util.CachedItem;
@@ -53,8 +53,8 @@ public class ItemPickupQueue {
     }
 
     @SubscribeEvent
-    public static void onConfigChanged(final OnConfigChangedEvent event) {
-        if (SmartHUD.ID.equals(event.getModID())) {
+    public static void onConfigChanged(final ModConfig.ModConfigEvent event) {
+        if (SmartHUD.ID.equals(event.getConfig().getModId())) {
             reloadQueue();
         }
     }
