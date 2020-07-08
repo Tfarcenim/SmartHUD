@@ -148,15 +148,15 @@ public final class WhitelistParser {
         }
     }
 
-    public static boolean isDimensionRegistered(final String dim) {
+    /*public static boolean isDimensionRegistered(final String dim) {
         ResourceLocation id = new ResourceLocation(dim);
-        return Registry.DIMENSION_TYPE.getValue(id).isPresent();
-    }
+        //return Registry.DIMENSION_TYPE_KEY.getValue(id).isPresent();
+    }*/
 
     private static boolean isDimensionPresent(final String dim, final int index) {
-        if (isDimensionRegistered(dim)) return true;
-        SmartHUD.LOGGER.warn("Unregistered or invalid dimension {} found in whitelist entry at index {}", dim, index);
-        return false;
+         return true;
+        //SmartHUD.LOGGER.warn("Unregistered or invalid dimension {} found in whitelist entry at index {}", dim, index);
+       // return false;
     }
 
     private static File getOrGenerateJson() {

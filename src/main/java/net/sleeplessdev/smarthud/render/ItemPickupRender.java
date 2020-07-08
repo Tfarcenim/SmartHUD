@@ -60,7 +60,7 @@ public final class ItemPickupRender implements RenderEvent {
         boolean name = ModulesConfig.itemPickupStyle.hasLabel;
         String key = "label." + SmartHUD.ID + ".pickup." + (name ? "long" : "short");
         String count = StringHelper.getAbbreviatedValue(item.count);
-        String label = I18n.format(key, count, item.getName().getFormattedText());
+        String label = I18n.format(key, count, item.getName().getUnformattedComponentText());
 
         int color = 0xFFFFFF;
         int labelWidth = ctx.getStringWidth(label);
@@ -92,7 +92,7 @@ public final class ItemPickupRender implements RenderEvent {
             //            }
         }
 
-        ctx.drawStringWithShadow(label, labelX, renderY, color);
+        ctx.drawStringWithShadow(ctx.matrices,label, labelX, renderY, color);
 
         if (ModulesConfig.itemPickupStyle.hasIcon) {
             GlStateManager.enableBlend();

@@ -2,7 +2,6 @@ package net.sleeplessdev.smarthud.util;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.dimension.DimensionType;
 import net.sleeplessdev.smarthud.SmartHUD;
 import net.sleeplessdev.smarthud.config.ModulesConfig;
 

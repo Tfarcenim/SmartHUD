@@ -1,5 +1,6 @@
 package net.sleeplessdev.smarthud.util;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -13,12 +14,14 @@ public final class RenderContext {
     public final int screenWidth;
     public final int screenHeight;
     public final float partialTicks;
+    public final MatrixStack matrices;
 
     public RenderContext(final Minecraft mc, final RenderGameOverlayEvent event) {
         client = mc;
         screenWidth = mc.getMainWindow().getScaledWidth();
         screenHeight = mc.getMainWindow().getScaledHeight();
         partialTicks = event.getPartialTicks();
+        matrices = event.getMatrixStack();
     }
 
     public GameSettings getGameSettings() {
@@ -45,16 +48,16 @@ public final class RenderContext {
         client.getTextureManager().bindTexture(texture);
     }
 
-    public void drawTexturedModalRect(final int x, final int y, final int textureX, final int textureY, final int width, final int height) {
-        client.ingameGUI.blit(x, y, textureX, textureY, width, height);
+    public void drawTexturedModalRect(MatrixStack stack,final int x, final int y, final int textureX, final int textureY, final int width, final int height) {
+        client.ingameGUI.blit(stack,x, y, textureX, textureY, width, height);
     }
 
-    public void drawStringWithShadow(final String text, final float x, final float y, final int color) {
-        client.fontRenderer.drawStringWithShadow(text, x, y, color);
+    public void drawStringWithShadow(MatrixStack stack,final String text, final float x, final float y, final int color) {
+        client.fontRenderer.drawStringWithShadow(stack,text, x, y, color);
     }
 
-    public void drawStringWithShadow(final String text, final float x, final float y) {
-        client.fontRenderer.drawStringWithShadow(text, x, y, 0xFFFFFFFF);
+    public void drawStringWithShadow(MatrixStack stack,final String text, final float x, final float y) {
+        client.fontRenderer.drawStringWithShadow(stack,text, x, y, 0xFFFFFFFF);
     }
 
     public void renderItem(final ItemStack stack, final int x, final int y, final boolean includeEffect) {

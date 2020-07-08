@@ -83,7 +83,7 @@ public final class HotbarRender implements RenderEvent {
                     // Keeps string to right edge of slot in left-handed mode
 
                     GlStateManager.disableDepthTest();
-                    ctx.drawStringWithShadow(StringHelper.getAbbreviatedValue(count), labelX, labelY);
+                    ctx.drawStringWithShadow(ctx.matrices,StringHelper.getAbbreviatedValue(count), labelX, labelY);
                 }
             }
         } else if (ModulesConfig.alwaysShow.get() && ModulesConfig.hotbarStyle != HotbarStyle.INVISIBLE) {
@@ -123,8 +123,8 @@ public final class HotbarRender implements RenderEvent {
                     RenderHelper.enableStandardItemLighting();
 
                     ctx.bindTexture(AbstractGui.GUI_ICONS_LOCATION);
-                    ctx.drawTexturedModalRect(x, y, 0, 94, 18, 18);
-                    ctx.drawTexturedModalRect(x, y + 18 - strPixel, 18, 112 - strPixel, 18, strPixel);
+                    ctx.drawTexturedModalRect(ctx.matrices,x, y, 0, 94, 18, 18);
+                    ctx.drawTexturedModalRect(ctx.matrices,x, y + 18 - strPixel, 18, 112 - strPixel, 18, strPixel);
 
                     RenderHelper.disableStandardItemLighting();
 
@@ -159,13 +159,13 @@ public final class HotbarRender implements RenderEvent {
         int textureY = ModulesConfig.hotbarStyle.textureY;
 
         ctx.bindTexture(HotbarRender.HUD_ELEMENTS);
-        ctx.drawTexturedModalRect(x, y, 0, textureY, 11, 22);
+        ctx.drawTexturedModalRect(ctx.matrices,x, y, 0, textureY, 11, 22);
 
         for (int i = 0; i < ((slots - 1) * 2); ++i) {
             int textureX = i % 2 == 0 ? 32 : 22;
-            ctx.drawTexturedModalRect(x + (11 + (10 * i)), y, textureX, textureY, 10, 22);
+            ctx.drawTexturedModalRect(ctx.matrices,x + (11 + (10 * i)), y, textureX, textureY, 10, 22);
         }
 
-        ctx.drawTexturedModalRect(x + (20 * slots) - 9, y, 11, textureY, 11, 22);
+        ctx.drawTexturedModalRect(ctx.matrices,x + (20 * slots) - 9, y, 11, textureY, 11, 22);
     }
 }
