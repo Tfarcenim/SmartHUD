@@ -1,6 +1,5 @@
 package net.sleeplessdev.smarthud.render;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.AbstractGui;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
@@ -42,12 +41,14 @@ public final class HotbarRender implements RenderEvent {
         int center = ctx.screenWidth / 2;
         int baseOffset = 98;
 
+        int yOffset = ctx.screenHeight + ModulesConfig.yOffset.get();
+
         if (cachedItems.size() > 0) {
             if (ModulesConfig.hotbarStyle != HotbarStyle.INVISIBLE) {
                 int width =  20 * cachedItems.size() + 6;
-                int offset = (int) HandHelper.getSideOffset(baseOffset, width);
+                int xOffset = (int) HandHelper.getSideOffset(baseOffset, width);
 
-                renderHotbarBackground(ctx, center + offset, ctx.screenHeight - 22, slots);
+                renderHotbarBackground(ctx, center + xOffset, yOffset, slots);
             }
 
             for (int i = 0; i < slots; i++) {
@@ -55,7 +56,7 @@ public final class HotbarRender implements RenderEvent {
                 ItemStack stack = cachedItem.stack;
                 int stackOffset = baseOffset + 3 + (20 * i);
                 int stackX = center + (int) HandHelper.getSideOffset(stackOffset, 16.0F);
-                int stackY = ctx.screenHeight - 19;
+                int stackY = yOffset + 3;
 
                 boolean renderOverlay = !stack.isStackable() && ModulesConfig.renderOverlays.get();
                 boolean showStackSize = cachedItem.count > 1 && ModulesConfig.showStackSize.get();
@@ -82,7 +83,7 @@ public final class HotbarRender implements RenderEvent {
                     if (labelX < center) labelX += 18 - stringWidth;
                     // Keeps string to right edge of slot in left-handed mode
 
-                    GlStateManager.disableDepthTest();
+                    RenderSystem.disableDepthTest();
                     ctx.drawStringWithShadow(ctx.matrices,StringHelper.getAbbreviatedValue(count), labelX, labelY);
                 }
             }
@@ -112,9 +113,9 @@ public final class HotbarRender implements RenderEvent {
                     int x = halfWidth + (side == HandSide.RIGHT ? -offset - 22 : offset + 6);
                     int strPixel = (int) (strength * 19);
 
-                    GlStateManager.color4f(1, 1, 1, 1);
-                    GlStateManager.enableRescaleNormal();
-                    GlStateManager.enableBlend();
+                    RenderSystem.color4f(1, 1, 1, 1);
+                    RenderSystem.enableRescaleNormal();
+                    RenderSystem.enableBlend();
                     RenderSystem.blendFuncSeparate(
                         SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA,
                         SourceFactor.ONE, DestFactor.ZERO
@@ -128,8 +129,8 @@ public final class HotbarRender implements RenderEvent {
 
                     RenderHelper.disableStandardItemLighting();
 
-                    GlStateManager.disableRescaleNormal();
-                    GlStateManager.disableBlend();
+                    RenderSystem.disableRescaleNormal();
+                    RenderSystem.disableBlend();
                 }
             }
             ctx.getGameSettings().attackIndicator = AttackIndicatorStatus.CROSSHAIR;

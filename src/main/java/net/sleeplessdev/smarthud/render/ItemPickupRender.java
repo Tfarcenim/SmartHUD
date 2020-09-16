@@ -1,7 +1,7 @@
 package net.sleeplessdev.smarthud.render;
 
 import com.google.common.collect.EvictingQueue;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -95,13 +95,13 @@ public final class ItemPickupRender implements RenderEvent {
         ctx.drawStringWithShadow(ctx.matrices,label, labelX, renderY, color);
 
         if (ModulesConfig.itemPickupStyle.hasIcon) {
-            GlStateManager.enableBlend();
+            RenderSystem.enableBlend();
             RenderHelper.enableStandardItemLighting();
-            GlStateManager.pushMatrix();
-            GlStateManager.translated(iconY, renderY - 1.5D, 0.0D);
-            GlStateManager.scaled(0.67D, 0.67D, 0.67D);
+            RenderSystem.pushMatrix();
+            RenderSystem.translated(iconY, renderY - 1.5D, 0.0D);
+            RenderSystem.scaled(0.67D, 0.67D, 0.67D);
             ctx.renderItem(item.stack, 0, 0, true); // TODO: Support AnimationStyle#FADE
-            GlStateManager.popMatrix();
+            RenderSystem.popMatrix();
             RenderHelper.disableStandardItemLighting();
         }
         return false;

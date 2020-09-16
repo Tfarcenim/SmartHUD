@@ -60,7 +60,7 @@ public final class SmartHUD {
 		PlayerEntity player = event.player;
 		List<ItemStack> inv = player.inventory.mainInventory;
 		List<CachedItem> inventoryCache = new ArrayList<>();
-		String dim = player.world.func_234922_V_().func_240901_a_().toString();
+		String dim = player.world.getDimensionKey().getLocation().toString();
 
 		for (int slot = 9; slot < 36; ++slot) {
 			ItemStack stack = inv.get(slot).copy();

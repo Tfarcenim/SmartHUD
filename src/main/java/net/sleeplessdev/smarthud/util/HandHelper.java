@@ -2,20 +2,9 @@ package net.sleeplessdev.smarthud.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.HandSide;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.sleeplessdev.smarthud.config.ModulesConfig;
 
-@OnlyIn(Dist.CLIENT)
 public class HandHelper {
-
-    public static HandSide getMainHand() {
-        return Minecraft.getInstance().gameSettings.mainHand;
-    }
-
-    public static boolean isLeftHanded() {
-        return getMainHand() == HandSide.LEFT;
-    }
 
     /**
      * Used to automatically adjust element offset on the screen depending on
@@ -25,16 +14,17 @@ public class HandHelper {
      * @param objectWidth   The current width of the element, used when inverting the position to the negative
      * @return The new offset depending on the current game setting
      */
-    public static float getSideOffset(float currentOffset, final float objectWidth) {
-        float offset = currentOffset;
-        currentOffset += ModulesConfig.xOffset.get();
-        float newOffset = 0.0F;
-
-        if (isLeftHanded()) {
-            offset = -currentOffset;
-            newOffset = -objectWidth;
+    public static float getSideOffset(final float currentOffset, final float objectWidth) {
+        float newOffset = currentOffset + ModulesConfig.xOffset.get();
+        boolean leftHand = Minecraft.getInstance().gameSettings.mainHand == HandSide.LEFT;
+        if (leftHand) {
+            newOffset = -newOffset;
+            newOffset -= objectWidth;
         }
+        return newOffset;
+    }
 
-        return offset + newOffset;
+    public static boolean isLeftHanded() {
+        return Minecraft.getInstance().gameSettings.mainHand == HandSide.LEFT;
     }
 }

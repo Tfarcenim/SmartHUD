@@ -45,8 +45,10 @@ public class ModulesConfig {
 		mergeDuplicates = builder.define("mergeDuplicates",true);
 		renderOverlays = builder.define("renderOverlays",true);
 		showStackSize = builder.define("showStacksize",false);
-		slotLimit = builder.defineInRange("slotLimit",3,1,9);
+		slotLimit = builder.defineInRange("slotLimit",3,1,27);
 		xOffset = builder.defineInRange("xOffset",0,Integer.MIN_VALUE,Integer.MAX_VALUE);
+		yOffset = builder.defineInRange("yOffset",-22,Integer.MIN_VALUE,Integer.MAX_VALUE);
+
 		builder.pop();
 
 		builder.push("itempickup");
@@ -63,7 +65,8 @@ public class ModulesConfig {
 		public static ForgeConfigSpec.BooleanValue itemPickupEnabled;
 		public static ForgeConfigSpec.IntValue itemLimit;
 		public static ForgeConfigSpec.IntValue xOffset;
-		//@Comment({ "0: The most recently picked up item will be moved to the first slot",
+	public static ForgeConfigSpec.IntValue yOffset;
+	//@Comment({ "0: The most recently picked up item will be moved to the first slot",
 		//           "1: The order will remain the same, only item counts will be changed" })
 		//@RangeInt(min = 0, max = 1)
 		public static ForgeConfigSpec.IntValue priorityMode;
